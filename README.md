@@ -88,7 +88,8 @@ sagemaker-unified-studio-demo/
 ├── docs/
 │   ├── setup.md                       # Detailed deployment instructions
 │   ├── student-guide.md               # Step-by-step walkthrough
-│   └── architecture.md                # Technical architecture details
+│   ├── architecture.md                # Technical architecture details
+│   └── env-setup.md                   # Environment configuration guide
 ├── notebooks/
 │   ├── 01_explore_data.ipynb          # Step 2: Data exploration
 │   ├── 02_clean_data.ipynb            # Step 3: Data cleaning
@@ -105,6 +106,7 @@ sagemaker-unified-studio-demo/
 │   └── create_pipeline.py             # Step 10: Workflow orchestration
 ├── data/
 │   └── .gitkeep                       # Generated data goes here
+├── inference.py                       # SageMaker inference script
 ├── pyproject.toml                     # Python dependencies (uv)
 ├── .python-version                    # Python 3.11
 ├── deploy.sh                          # Automated deployment script
@@ -167,8 +169,13 @@ This script:
 3. Select your domain
 4. Create a new project using the **ML Development** blueprint
 5. Upload notebooks from the `notebooks/` directory
+6. Upload `inference.py` to the project root
 
-### 5. Follow Student Guide
+### 5. Configure Environment
+
+Create `.env` file with your CloudFormation outputs. See [docs/env-setup.md](docs/env-setup.md) for details.
+
+### 6. Follow Student Guide
 
 Open [docs/student-guide.md](docs/student-guide.md) and work through each notebook step-by-step.
 
@@ -273,6 +280,7 @@ aws cloudformation delete-stack \
 - **[Setup Guide](docs/setup.md)** - Detailed deployment instructions
 - **[Student Guide](docs/student-guide.md)** - Step-by-step notebook walkthrough
 - **[Architecture](docs/architecture.md)** - Technical implementation details
+- **[Environment Setup](docs/env-setup.md)** - Configure .env file
 
 ## Troubleshooting
 

@@ -288,28 +288,31 @@ All notebooks should appear in the project's Notebooks tab.
 
 ### 9.1 Create Environment File
 
-In a notebook, create `.env`:
+In the project terminal (or locally before upload):
 
-```python
-import os
-
-# Get from CloudFormation outputs
-bucket_name = "sagemaker-unified-overheat-demo-<account-id>"
-execution_role = "arn:aws:iam::<account-id>:role/SageMakerExecutionRole-overheat-demo"
-
-# Write to file
-with open('.env', 'w') as f:
-    f.write(f"BUCKET_NAME={bucket_name}\n")
-    f.write(f"EXECUTION_ROLE={execution_role}\n")
-    f.write(f"REGION=eu-west-1\n")
-```
-
-Or manually create `/home/sagemaker-user/.env`:
 ```bash
-BUCKET_NAME=sagemaker-unified-overheat-demo-123456789012
-EXECUTION_ROLE=arn:aws:iam::123456789012:role/SageMakerExecutionRole-overheat-demo
+# Automatic creation
+cat > .env << EOF
+BUCKET_NAME=$(aws cloudformation describe-stacks \
+  --stack-name sagemaker-overheat-project \
+  --query 'Stacks[0].Outputs[?OutputKey==`DataBucketName`].OutputValue' \
+  --output text \
+  --region eu-west-1)
+EXECUTION_ROLE=$(aws cloudformation describe-stacks \
+  --stack-name sagemaker-overheat-project \
+  --query 'Stacks[0].Outputs[?OutputKey==`ExecutionRoleArn`].OutputValue' \
+  --output text \
+  --region eu-west-1)
 REGION=eu-west-1
+EOF
 ```
+
+Verify:
+```bash
+cat .env
+```
+
+See `docs/env-setup.md` for more details.
 
 ## Troubleshooting
 
