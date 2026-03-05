@@ -56,3 +56,4 @@ data/*.csv
 *.pkl
 *.joblib
 model/
+aws_credentials.yaml
