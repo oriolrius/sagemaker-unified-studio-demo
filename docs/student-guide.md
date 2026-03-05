@@ -2,7 +2,7 @@
 
 This guide walks you through each step of the ML lifecycle using **SageMaker Unified Studio**.
 
-> **Note**: SageMaker Unified Studio is a unified data and AI development environment that integrates data governance (DataZone), analytics, and ML. You'll access it via IAM Identity Center (SSO), not traditional IAM credentials.
+> **Note**: SageMaker Unified Studio is a unified data and AI development environment that integrates data governance (DataZone), analytics, and ML. With IAM-based domains, you can access it directly through the AWS Console without requiring IAM Identity Center (SSO).
 
 ## Learning Objectives
 
@@ -21,10 +21,10 @@ By the end of this demo, you will:
 
 ## Prerequisites
 
-- SageMaker Unified Studio domain created (see [Setup Guide](setup.md))
-- Project created using **ML Development** blueprint
-- Notebooks uploaded to project
-- Data registered in SageMaker Catalog
+- SageMaker Unified Studio IAM-based domain created (see [Setup Guide](setup.md))
+- Notebooks uploaded to JupyterLab
+- Data uploaded to S3 bucket
+- `.env` file configured with bucket name, execution role, and region
 
 ## The ML Lifecycle: 10 Steps
 
@@ -111,7 +111,7 @@ df['temperature'].hist(bins=50)
 
 **Key insights to observe:**
 
-- Dataset has 10,000 rows
+- Dataset has **216,000 rows** (5 machines × 30 days × 1,440 readings/day)
 - 5 machines (M1-M5)
 - Temperature ranges from ~55°C to ~95°C
 - Room temperature is stable around 25°C

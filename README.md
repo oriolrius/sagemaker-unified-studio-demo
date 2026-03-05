@@ -2,7 +2,7 @@
 
 An end-to-end machine learning project demonstrating the complete ML lifecycle using **AWS SageMaker Unified Studio**. This project predicts whether factory machines will overheat based on temperature sensor data.
 
-> **Important**: This uses **SageMaker Unified Studio** (the unified data and AI development environment), not SageMaker Studio Classic. SageMaker Unified Studio integrates data governance (DataZone), analytics, and ML in a single platform with IAM Identity Center authentication.
+> **Important**: This uses **SageMaker Unified Studio** (the unified data and AI development environment), not SageMaker Studio Classic. SageMaker Unified Studio integrates data governance (DataZone), analytics, and ML in a single platform. This project uses an **IAM-based domain**, which is simpler to set up than the IAM Identity Center approach.
 
 ## Project Overview
 
@@ -119,24 +119,23 @@ sagemaker-unified-studio-demo/
 
 - AWS CLI configured with appropriate credentials
 - [uv](https://docs.astral.sh/uv/) for Python dependency management
-- **AWS IAM Identity Center** configured (required for SageMaker Unified Studio)
-- IAM permissions for DataZone, S3, IAM role creation
+- IAM permissions for DataZone, SageMaker, S3, and IAM role creation
 - Python 3.11+
 
 ### 1. Create SageMaker Unified Studio Domain (Manual - One Time)
 
 SageMaker Unified Studio domains must be created via the AWS Console:
 
-1. Navigate to https://console.aws.amazon.com/datazone (region: **eu-west-1**)
-2. Choose **Create a Unified Studio domain** → **Quick setup**
-3. Create or select a VPC (or use "Create new VPC")
-4. Review default settings (domain name, roles, encryption)
-5. Create or select an **IAM Identity Center user** (SSO required)
-6. Choose **Create domain**
+1. Navigate to https://eu-west-1.console.aws.amazon.com/datazone
+2. Look for **"Get started with Amazon SageMaker Unified Studio"**
+3. Click **"Open"** (or **"Set up"** if first time)
+4. If setting up, choose **"Auto-create a new role with admin permissions"**
+5. Keep **S3 Tables integration** enabled
+6. Click **"Set up"**
 
-**Estimated time**: 10-15 minutes
+**Estimated time**: 2-3 minutes
 
-> **Why manual?** SageMaker Unified Studio has limited CloudFormation support as of 2026. AWS recommends console-based domain creation with IAM Identity Center authentication. IAM roles cannot log in to Unified Studio.
+> **Why manual?** SageMaker Unified Studio has limited CloudFormation support. AWS recommends console-based domain creation. This project uses IAM-based domains, which are simpler than IAM Identity Center domains.
 
 ### 2. Generate Synthetic Data
 
@@ -146,7 +145,7 @@ uv sync
 uv run python scripts/generate_data.py
 ```
 
-This creates `data/machines.csv` with 10,000 synthetic temperature readings.
+This creates `data/machines.csv` with 216,000 synthetic temperature readings (5 machines × 30 days × 1,440 readings/day).
 
 ### 3. Deploy Project Infrastructure
 
@@ -164,12 +163,11 @@ This script:
 
 ### 4. Access SageMaker Unified Studio
 
-1. Navigate to https://console.aws.amazon.com/datazone (region: **eu-west-1**)
-2. Sign in with your **IAM Identity Center user** (not IAM role)
-3. Select your domain
-4. Create a new project using the **ML Development** blueprint
-5. Upload notebooks from the `notebooks/` directory
-6. Upload `inference.py` to the project root
+1. Navigate to https://eu-west-1.console.aws.amazon.com/datazone
+2. Click **"Open"** next to "Use your IAM based domain"
+3. In the Unified Studio portal, click **JupyterLab** in the left sidebar
+4. Upload notebooks from the `notebooks/` directory
+5. Upload `inference.py` to the project root
 
 ### 5. Configure Environment
 
@@ -286,15 +284,15 @@ aws cloudformation delete-stack \
 
 ### Cannot access Unified Studio
 
-**Issue**: "You don't have permission to access this domain"
+**Issue**: "No environment found" error when opening Unified Studio
 
-**Solution**: Ensure you're signed in with an **IAM Identity Center user**, not an IAM role. Only SSO users can access SageMaker Unified Studio.
+**Solution**: The domain may have broken environments. Delete and recreate the domain via the DataZone console (Actions → Delete).
 
-### Domain creation fails
+### JupyterLab won't start
 
-**Issue**: "No VPC configured for SageMaker Unified Studio"
+**Issue**: "Connecting to space" takes too long
 
-**Solution**: Create a VPC using the Quick setup option, or configure an existing VPC with proper subnets and security groups.
+**Solution**: Wait up to 5 minutes for first-time initialization. Try refreshing the page if it fails.
 
 ### Endpoint deployment fails
 

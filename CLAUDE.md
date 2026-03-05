@@ -7,7 +7,7 @@ Educational ML project for ESADE students demonstrating end-to-end machine learn
 - **Purpose**: Teach ML lifecycle from data ingestion to production deployment
 - **Problem**: Predict machine overheating (temperature > 80°C) from sensor data
 - **Audience**: ESADE students learning MLOps and AWS SageMaker
-- **Platform**: SageMaker Unified Studio (NOT Studio Classic) - requires IAM Identity Center (SSO)
+- **Platform**: SageMaker Unified Studio (NOT Studio Classic) - uses IAM-based authentication
 
 ## Tech Stack
 
@@ -44,9 +44,10 @@ sagemaker-unified-studio-demo/
 │
 ├── docs/
 │   ├── architecture.md          # Technical architecture (20KB, comprehensive)
-│   ├── setup.md                 # Deployment guide with IAM Identity Center
+│   ├── setup.md                 # Deployment guide with screenshots
 │   ├── student-guide.md         # 10-step ML lifecycle walkthrough
 │   ├── env-setup.md             # .env configuration instructions
+│   ├── images/                  # Screenshots for documentation
 │   ├── CLAUDE.md                # Duplicate (can be removed)
 │   ├── COMPLETE.md              # Outdated status file (can be removed)
 │   └── PROJECT_STATUS.md        # Outdated status file (can be removed)
@@ -69,7 +70,7 @@ sagemaker-unified-studio-demo/
 
 ## Data Schema
 
-**File**: `data/machines.csv` (generated, ~10,000 rows)
+**File**: `data/machines.csv` (generated, ~216,000 rows)
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -182,7 +183,7 @@ def predict_fn(input_data, model):
 
 ### SageMaker Unified Studio vs Studio Classic
 - This project uses **Unified Studio** (integrated with DataZone)
-- Requires **IAM Identity Center** (SSO) authentication
+- Uses **IAM-based domain** (simpler than IAM Identity Center/SSO)
 - Domain must be created **manually via AWS Console** (limited CloudFormation support)
 - Access via: https://console.aws.amazon.com/datazone
 

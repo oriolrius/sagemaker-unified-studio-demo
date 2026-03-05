@@ -2,15 +2,16 @@
 
 This guide walks through deploying the complete infrastructure for the machine overheat prediction demo.
 
+> **Screenshots**: This guide includes screenshots to help you navigate the AWS Console. All screenshots are from the eu-west-1 region.
+
 ## Prerequisites Checklist
 
 Before starting, ensure you have:
 
 - [ ] AWS CLI installed and configured
-- [ ] AWS credentials with appropriate permissions
+- [ ] AWS credentials with appropriate permissions (Manager/Admin role)
 - [ ] Python 3.11+ installed
 - [ ] [uv](https://docs.astral.sh/uv/) installed
-- [ ] AWS Organizations enabled (for IAM Identity Center)
 
 ### Verify AWS CLI
 
@@ -40,7 +41,8 @@ Your AWS user/role needs these permissions:
         "iam:AttachRolePolicy",
         "iam:PassRole",
         "cloudformation:*",
-        "sso:*"
+        "glue:*",
+        "lakeformation:*"
       ],
       "Resource": "*"
     }
@@ -48,78 +50,49 @@ Your AWS user/role needs these permissions:
 }
 ```
 
-## Step 1: Setup IAM Identity Center (One-Time)
+## Step 1: Create SageMaker Unified Studio Domain (IAM-based)
 
-SageMaker Unified Studio requires IAM Identity Center (SSO) for authentication.
+SageMaker Unified Studio now supports **IAM-based domains** which are simpler to set up than Identity Center-based domains.
 
-### 1.1 Enable IAM Identity Center
+### 1.1 Navigate to Console
 
-```bash
-# Check if already enabled
-aws sso-admin list-instances --region eu-west-1
-```
+1. Go to https://eu-west-1.console.aws.amazon.com/datazone
+2. Ensure region is set to **eu-west-1** (check the region selector in the top-right corner)
 
-If not enabled:
-1. Navigate to https://console.aws.amazon.com/singlesignon
-2. Choose **Enable IAM Identity Center**
-3. Select **AWS Organizations** as identity source
+You should see the DataZone landing page:
 
-### 1.2 Create SSO User
+![DataZone Console Landing Page](images/01-datazone-console.png)
 
-1. In IAM Identity Center console, go to **Users**
-2. Choose **Add user**
-3. Enter user details:
-   - Username: `student`
-   - Email: your email
-   - First/Last name
-4. Choose **Next** → **Add user**
-5. User receives email with password setup link
+### 1.2 Set Up IAM-based Domain
 
-### 1.3 Verify SSO User
+1. On the landing page, look for the **"Get started with Amazon SageMaker Unified Studio"** section
+2. Click the **"Open"** button (or **"Set up"** if this is your first time)
 
-```bash
-aws identitystore list-users \
-  --identity-store-id <identity-store-id> \
-  --region eu-west-1
-```
+![Click Open to Access Unified Studio](images/02-unified-studio-open.png)
 
-## Step 2: Create SageMaker Unified Studio Domain
+3. If setting up for the first time, configure:
+   - **Execution IAM role**: Select "Auto-create a new role with admin permissions" (recommended)
+   - **S3 Tables integration**: Keep enabled (checkbox checked)
+   - **Data encryption**: Use AWS owned key (default)
+4. Click **"Set up"**
 
-Domains must be created via the AWS Console (limited CloudFormation support).
+**Expected time**: 2-3 minutes for initial setup
 
-### 2.1 Navigate to Console
+### 1.3 Verify Domain Creation
 
-1. Go to https://console.aws.amazon.com/datazone
-2. Ensure region is set to **eu-west-1**
-
-### 2.2 Create Domain (Quick Setup)
-
-1. Choose **Create a Unified Studio domain**
-2. Select **Quick setup**
-3. Configure VPC:
-   - Choose **Create new VPC** (recommended for demo)
-   - Or select existing VPC with proper subnets
-4. Expand **Quick setup settings**:
-   - Domain name: `overheat-demo-domain`
-   - Leave other defaults (roles, encryption)
-5. **Onboard your data** (optional): Skip for now
-6. **Create IAM Identity Center user**:
-   - Select the `student` user created in Step 1
-7. Choose **Create domain**
-
-**Expected time**: 10-15 minutes
-
-### 2.3 Verify Domain Creation
+After setup completes, a new browser tab opens with the Unified Studio portal.
 
 ```bash
-# List domains (via DataZone API)
+# List domains via CLI
 aws datazone list-domains --region eu-west-1
 ```
 
-## Step 3: Generate Synthetic Data
+You should see a domain with `domainVersion: V2` and `status: AVAILABLE`.
+
+## Step 2: Generate Synthetic Data
 
 ```bash
-cd /home/oriol/esade/sagemaker-unified-studio-demo
+cd /path/to/sagemaker-unified-studio-demo
 
 # Install dependencies
 uv sync
@@ -128,7 +101,7 @@ uv sync
 uv run python scripts/generate_data.py
 ```
 
-**Output**: `data/machines.csv` with 10,000 temperature readings
+**Output**: `data/machines.csv` with **216,000 temperature readings** (5 machines × 30 days × 1,440 readings/day)
 
 ### Inspect the Data
 
@@ -143,9 +116,11 @@ timestamp,machine_id,temperature,room_temp
 2026-02-03 00:01:00,M1,66.1,24.9
 ```
 
-## Step 4: Deploy Project Resources
+**Note**: The file is approximately 8-9 MB in size.
 
-### 4.1 Create CloudFormation Stack
+## Step 3: Deploy Project Resources
+
+### 3.1 Create CloudFormation Stack
 
 ```bash
 ./deploy.sh
@@ -168,7 +143,7 @@ aws cloudformation wait stack-create-complete \
 
 **Expected time**: 2-3 minutes
 
-### 4.2 Verify Stack Outputs
+### 3.2 Verify Stack Outputs
 
 ```bash
 aws cloudformation describe-stacks \
@@ -183,7 +158,7 @@ Expected outputs:
 - `ExecutionRoleArn`: IAM role ARN
 - `Region`: eu-west-1
 
-### 4.3 Upload Data to S3
+### 3.3 Upload Data to S3
 
 ```bash
 uv run python scripts/upload_to_s3.py
@@ -200,170 +175,179 @@ BUCKET=$(aws cloudformation describe-stacks \
 aws s3 ls s3://$BUCKET/data/raw/ --region eu-west-1
 ```
 
-## Step 5: Access SageMaker Unified Studio
+## Step 4: Access SageMaker Unified Studio
 
-### 5.1 Get Portal URL
+### 4.1 Open the Portal
 
-1. Navigate to https://console.aws.amazon.com/datazone (region: eu-west-1)
-2. Select your domain: `overheat-demo-domain`
-3. Copy the **Portal URL** (or click **Open portal**)
+1. Navigate to https://eu-west-1.console.aws.amazon.com/datazone
+2. Click **"Open"** next to "Use your IAM based domain"
+3. You'll be redirected to the Unified Studio portal
 
-### 5.2 Sign In
+### 4.2 Navigate the Project
 
-1. Open the Portal URL
-2. Sign in with IAM Identity Center credentials:
-   - Username: `student`
-   - Password: (set via email link)
+The IAM-based domain automatically creates an admin project. In the portal:
+- **Overview**: Project dashboard
+- **Files**: File browser
+- **Data**: Data catalog and connections
+- **Notebooks**: Jupyter notebooks
+- **JupyterLab**: Full JupyterLab IDE (under IDEs section)
+- **MLflow**: Experiment tracking
+- **Models**: Model registry
+- **Inference endpoints**: Deployed models
 
-**First login takes 1-2 minutes** to initialize.
+## Step 5: Launch JupyterLab
 
-## Step 6: Create Project
+### 5.1 Open JupyterLab
 
-### 6.1 Create Project via Console
+1. In the Unified Studio portal, look at the left sidebar
+2. Under **IDEs**, click **JupyterLab**
+3. Wait for the space to initialize (first time takes 2-3 minutes)
 
-1. In Unified Studio portal, choose **Create project**
-2. Configure project:
-   - Name: `machine-overheat-prediction`
-   - Description: `Predict machine overheating from temperature sensors`
-   - Blueprint: **ML Development**
-3. Choose **Create project**
+![Unified Studio Portal with JupyterLab](images/03-unified-studio-portal.png)
 
-**Expected time**: 3-5 minutes
+JupyterLab opens with:
+- File browser on the left
+- Python 3 kernel ready to use
+- Terminal access (File → New → Terminal)
 
-### 6.2 Access Project
+### 5.2 Upload Notebooks
 
-1. From portal home, select **Projects**
-2. Click on `machine-overheat-prediction`
-3. You'll see tabs: **Overview**, **Data**, **Notebooks**, **Models**, **Pipelines**
+In JupyterLab:
+1. Click the **Upload Files** button (↑ icon) in the file browser toolbar
+2. Upload all notebooks from the `notebooks/` directory:
+   - `01_explore_data.ipynb`
+   - `02_clean_data.ipynb`
+   - `03_feature_engineering.ipynb`
+   - `04_train_model.ipynb`
+   - `05_mlflow_tracking.ipynb`
+   - `06_model_registry.ipynb`
+   - `07_validate_model.ipynb`
+   - `08_deploy_endpoint.ipynb`
 
-## Step 7: Upload Notebooks
+**Alternative - Git Clone:**
+1. Open a terminal in JupyterLab (File → New → Terminal)
+2. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   ```
+3. Notebooks will be available in the cloned directory
 
-### 7.1 Navigate to Notebooks
+## Step 6: Register Data Connection
 
-1. In project, click **Notebooks** tab
-2. Choose **Upload** (↑ icon)
+### 6.1 Add S3 Connection
 
-### 7.2 Upload All Notebooks
+1. In the portal, go to **Data** → **Connections**
+2. Click **Add connection**
+3. Select **Amazon S3**
+4. Configure:
+   - Name: `overheat-demo-data`
+   - S3 URI: `s3://<your-bucket-name>/data/raw/`
+   - Leave Access role ARN empty (uses default)
+5. Click **Add**
 
-Upload these files from `notebooks/` directory:
-- `01_explore_data.ipynb`
-- `02_clean_data.ipynb`
-- `03_feature_engineering.ipynb`
-- `04_train_model.ipynb`
-- `05_mlflow_tracking.ipynb`
-- `06_model_registry.ipynb`
-- `07_validate_model.ipynb`
-- `08_deploy_endpoint.ipynb`
+### 6.2 Verify Connection
 
-### 7.3 Verify Upload
+The S3 data should now be accessible from notebooks using the connection.
 
-All notebooks should appear in the project's Notebooks tab.
+## Step 7: Configure Environment Variables
 
-## Step 8: Register Data in Catalog
+The notebooks use environment variables to access AWS resources. You need to create a `.env` file in JupyterLab.
 
-### 8.1 Navigate to Data Catalog
+### 7.1 Get CloudFormation Stack Outputs
 
-1. In project, click **Data** tab
-2. Choose **Register data source**
-
-### 8.2 Register S3 Data
-
-1. Select **Amazon S3**
-2. Configure:
-   - Connection name: `overheat-data`
-   - Bucket: (select your bucket from dropdown)
-   - Prefix: `data/raw/`
-3. Add metadata:
-   - Description: `Machine temperature sensor data`
-   - Tags: `demo`, `iot`, `temperature`
-4. Choose **Register**
-
-### 8.3 Verify Registration
-
-1. Go to **Data** tab
-2. You should see `machines.csv` listed
-3. Click on it to view metadata and preview
-
-## Step 9: Configure Environment
-
-### 9.1 Create Environment File
-
-In the project terminal (or locally before upload):
+First, get the values from the CloudFormation stack:
 
 ```bash
-# Automatic creation
-cat > .env << EOF
-BUCKET_NAME=$(aws cloudformation describe-stacks \
+# Get bucket name
+aws cloudformation describe-stacks \
   --stack-name sagemaker-overheat-project \
   --query 'Stacks[0].Outputs[?OutputKey==`DataBucketName`].OutputValue' \
   --output text \
-  --region eu-west-1)
-EXECUTION_ROLE=$(aws cloudformation describe-stacks \
+  --region eu-west-1
+
+# Get execution role ARN
+aws cloudformation describe-stacks \
   --stack-name sagemaker-overheat-project \
   --query 'Stacks[0].Outputs[?OutputKey==`ExecutionRoleArn`].OutputValue' \
   --output text \
-  --region eu-west-1)
+  --region eu-west-1
+```
+
+### 7.2 Create .env File in JupyterLab
+
+1. In JupyterLab, click **File** → **New** → **Text File**
+2. Add the following content (replace with your actual values):
+
+```
+BUCKET_NAME=sagemaker-unified-overheat-demo-<account-id>
+EXECUTION_ROLE=arn:aws:iam::<account-id>:role/SageMakerExecutionRole-overheat-demo
 REGION=eu-west-1
-EOF
 ```
 
-Verify:
-```bash
-cat .env
+3. Click **File** → **Save As** and save as `.env` (note the leading dot)
+4. The file should be saved in `/shared/.env` for persistence
+
+**Example .env file:**
+```
+BUCKET_NAME=sagemaker-unified-overheat-demo-792641153717
+EXECUTION_ROLE=arn:aws:iam::792641153717:role/SageMakerExecutionRole-overheat-demo
+REGION=eu-west-1
 ```
 
-See `docs/env-setup.md` for more details.
+### 7.3 Verify Configuration
+
+Run this in a notebook cell to verify:
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+print(f"Using bucket: {os.getenv('BUCKET_NAME')}")
+print(f"Using role: {os.getenv('EXECUTION_ROLE')}")
+print(f"Region: {os.getenv('REGION')}")
+```
+
+You should see your bucket name, role ARN, and region printed.
 
 ## Troubleshooting
 
-### Cannot access Unified Studio portal
+### JupyterLab won't start
 
-**Issue**: "You don't have permission to access this domain"
-
-**Solution**: 
-- Ensure you're signed in with IAM Identity Center user (not IAM role)
-- Verify user was added to domain during creation
-- Check user has proper permissions in IAM Identity Center
-
-### Domain creation fails
-
-**Issue**: "No VPC configured for SageMaker Unified Studio"
-
-**Solution**: Use Quick setup to create a new VPC, or ensure existing VPC has:
-- At least 2 subnets in different AZs
-- Internet gateway
-- Proper security groups
-
-### Data upload fails
-
-**Issue**: S3 access denied
+**Issue**: "Connecting to space" takes too long or fails
 
 **Solution**:
-```bash
-# Check bucket policy
-aws s3api get-bucket-policy \
-  --bucket $BUCKET_NAME \
-  --region eu-west-1
+- Wait up to 5 minutes for first-time initialization
+- Check the space configuration in **Configure space** button
+- Try refreshing the page
 
-# Verify IAM permissions
-aws iam get-role \
-  --role-name SageMakerExecutionRole-overheat-demo
-```
+### "No environment found" error
 
-### Project creation fails
+**Issue**: Login shows "ValidationException - No environment found"
 
-**Issue**: "Blueprint not available"
+**Solution**: The domain may have broken environments. Delete and recreate the domain:
+1. Go to Domains page in DataZone console
+2. Click Actions → Delete on the IAM-based domain
+3. Confirm deletion
+4. Set up a new domain
 
-**Solution**: Ensure domain was created with ML capabilities enabled. Check domain settings in console.
+### Data connection fails
 
-### Notebooks won't start
-
-**Issue**: Kernel fails to start
+**Issue**: Cannot access S3 data from notebooks
 
 **Solution**:
-- Check execution role has SageMaker permissions
-- Verify VPC configuration allows internet access
-- Try restarting the notebook instance
+- Verify the S3 bucket exists and has data
+- Check IAM role permissions
+- Try using direct S3 paths: `s3://<bucket>/data/raw/machines.csv`
+
+### Kernel dies or restarts
+
+**Issue**: Python kernel crashes when running notebooks
+
+**Solution**:
+- Check memory usage in the space configuration
+- Restart the kernel: Kernel → Restart Kernel
+- Try a larger instance type if available
 
 ## Next Steps
 
@@ -394,12 +378,9 @@ aws cloudformation delete-stack \
   --stack-name sagemaker-overheat-project \
   --region eu-west-1
 
-# 4. Delete project in Unified Studio (via console)
-# Navigate to project → Settings → Delete project
-
-# 5. Delete domain (via console)
-# Navigate to https://console.aws.amazon.com/datazone
-# Select domain → Actions → Delete domain
+# 4. Delete domain (via console)
+# Navigate to https://eu-west-1.console.aws.amazon.com/datazone
+# Click Actions → Delete on the IAM-based domain
 ```
 
-**Note**: Domain deletion can take 10-15 minutes.
+**Note**: Domain deletion takes 1-2 minutes.
