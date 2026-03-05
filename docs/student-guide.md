@@ -26,6 +26,26 @@ By the end of this demo, you will:
 - Data uploaded to S3 bucket
 - `.env` file configured with bucket name, execution role, and region
 
+## Getting Started
+
+### Upload Notebooks to JupyterLab
+
+1. In JupyterLab, click the **Upload Files** button in the file browser
+2. Select all 8 notebooks from the `notebooks/` directory and `inference.py`
+3. Files appear in `/shared/` directory
+
+![Notebooks uploaded to JupyterLab](images/11-notebooks-uploaded.png)
+
+### Configure Environment
+
+Create a `.env` file with your CloudFormation outputs:
+
+```
+BUCKET_NAME=sagemaker-unified-overheat-demo-<account-id>
+EXECUTION_ROLE=arn:aws:iam::<account-id>:role/SageMakerExecutionRole-overheat-demo
+REGION=eu-west-1
+```
+
 ## The ML Lifecycle: 10 Steps
 
 ### Step 1: Data Ingestion
@@ -70,9 +90,30 @@ Expected output:
 
 #### Open the Notebook
 
-1. In Unified Studio project, navigate to **Notebooks** tab
-2. Double-click `01_explore_data.ipynb`
-3. Select kernel: `Python 3 (Data Science)`
+1. In JupyterLab, double-click `01_explore_data.ipynb`
+2. The notebook opens with the Python kernel ready
+
+![Notebook 01 opened in JupyterLab](images/12-notebook-01-before-execution.png)
+
+#### Execute the Notebook
+
+Run all cells with **Run → Run All Cells** or use **Shift+Enter** for each cell.
+
+**Cell 1 - Load environment:**
+
+![Environment loaded with bucket name](images/13-notebook-01-cell1-output.png)
+
+**Cell 2 - Load data from S3:**
+
+![Data loaded: 216,000 rows](images/14-notebook-01-cell2-data-loaded.png)
+
+**Cell 5-7 - Statistics and checks:**
+
+![Data statistics output](images/15-notebook-01-stats-output.png)
+
+**Completed notebook:**
+
+![Notebook 01 fully executed](images/16-notebook-01-completed.png)
 
 #### Key Code Cells
 
@@ -136,6 +177,14 @@ Expected: ~8-10%
 
 **What you'll learn**: How to handle missing data and prepare data for ML
 
+#### Open and Execute the Notebook
+
+![Notebook 02 before execution](images/17-notebook-02-before-execution.png)
+
+Run all cells to clean the data and save to S3.
+
+![Notebook 02 completed](images/18-notebook-02-completed.png)
+
 #### Cleaning Operations
 
 **1. Remove rows with missing temperature:**
@@ -180,6 +229,14 @@ Answer: Parquet is columnar, compressed, and faster to read for ML workloads.
 **Notebook**: `03_feature_engineering.ipynb`
 
 **What you'll learn**: How to create features that improve model performance
+
+#### Open and Execute the Notebook
+
+![Notebook 03 before execution](images/19-notebook-03-before-execution.png)
+
+Run all cells to create features and save the feature dataset.
+
+![Notebook 03 completed](images/20-notebook-03-completed.png)
 
 #### Create the Key Feature
 
@@ -246,6 +303,14 @@ df_final.to_parquet(output_path, index=False)
 **Notebook**: `04_train_model.ipynb`
 
 **What you'll learn**: How to train a model and evaluate it
+
+#### Open and Execute the Notebook
+
+![Notebook 04 before execution](images/21-notebook-04-before-execution.png)
+
+Run all cells to train the model and save to S3.
+
+![Notebook 04 completed](images/21-notebook-04-completed.png)
 
 #### Train/Test Split
 
@@ -328,6 +393,12 @@ s3_model_path = f's3://{bucket_name}/models/logistic_regression/model.pkl'
 
 **What you'll learn**: How to track experiments for reproducibility
 
+#### Execute the Notebook
+
+Run all cells to log the experiment with MLflow.
+
+![Notebook 05 completed](images/22-notebook-05-completed.png)
+
 #### Setup MLflow
 
 ```python
@@ -385,6 +456,12 @@ In SageMaker Unified Studio:
 
 **What you'll learn**: How to version and manage models
 
+#### Execute the Notebook
+
+Run all cells to register the model in SageMaker Model Registry.
+
+![Notebook 06 completed](images/23-notebook-06-completed.png)
+
 #### Register Model
 
 ```python
@@ -436,6 +513,12 @@ In SageMaker Unified Studio:
 
 **What you'll learn**: How to validate models before deployment
 
+#### Execute the Notebook
+
+Run all cells to validate the model before deployment.
+
+![Notebook 07 completed](images/24-notebook-07-completed.png)
+
 #### Load Test Data
 
 ```python
@@ -482,6 +565,18 @@ print(f"✓ Prediction distribution: {pred_dist.to_dict()}")
 **Notebook**: `08_deploy_endpoint.ipynb`
 
 **What you'll learn**: How to deploy a REST API for real-time predictions
+
+#### Execute the Notebook
+
+Run all cells to deploy the model and test predictions.
+
+![Notebook 08 test success](images/25-notebook-08-test-success.png)
+
+The endpoint test shows successful predictions:
+- Temperature 78°C → prediction=0 (no overheat), probability≈0%
+- Temperature 85°C → prediction=1 (overheat), probability=100%
+
+![Notebook 08 completed](images/26-notebook-08-completed.png)
 
 #### Create Inference Script
 
