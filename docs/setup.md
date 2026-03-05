@@ -195,42 +195,36 @@ The IAM-based domain automatically creates an admin project. In the portal:
 - **Models**: Model registry
 - **Inference endpoints**: Deployed models
 
-## Step 5: Launch JupyterLab
+## Step 5: Access Notebooks
 
-### 5.1 Open JupyterLab
+### 5.1 Open Notebooks
 
 1. In the Unified Studio portal, look at the left sidebar
-2. Under **IDEs**, click **JupyterLab**
-3. Wait for the space to initialize (first time takes 2-3 minutes)
+2. Click **Notebooks** (not JupyterLab)
+3. Click **Create notebook** to start a new notebook
 
-![Unified Studio Portal with JupyterLab](images/03-unified-studio-portal.png)
+![Unified Studio Portal](images/03-unified-studio-portal.png)
 
-JupyterLab opens with:
-- File browser on the left
-- Python 3 kernel ready to use
-- Terminal access (File → New → Terminal)
+The built-in Notebooks feature provides:
+- Python 3.11 environment
+- 2 vCPU, 4 GiB memory
+- Direct S3 access via boto3
+- Auto-save functionality
 
-### 5.2 Upload Notebooks
+> **Note**: The **JupyterLab** option under IDEs requires additional SageMaker Studio domain configuration. For this guide, we use the simpler built-in **Notebooks** feature which works out of the box.
 
-In JupyterLab:
-1. Click the **Upload Files** button (↑ icon) in the file browser toolbar
-2. Upload all notebooks from the `notebooks/` directory:
-   - `01_explore_data.ipynb`
-   - `02_clean_data.ipynb`
-   - `03_feature_engineering.ipynb`
-   - `04_train_model.ipynb`
-   - `05_mlflow_tracking.ipynb`
-   - `06_model_registry.ipynb`
-   - `07_validate_model.ipynb`
-   - `08_deploy_endpoint.ipynb`
+> **Important**: Always use the **Manager role** (esadeis_IsbManagersPS) when accessing AWS Console and SageMaker Unified Studio.
 
-**Alternative - Git Clone:**
-1. Open a terminal in JupyterLab (File → New → Terminal)
-2. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   ```
-3. Notebooks will be available in the cloned directory
+### 5.2 Create Notebooks from Code
+
+Instead of uploading .ipynb files, you'll create notebooks and paste code from the Student Guide:
+
+1. Click **Create notebook**
+2. Name it (e.g., "01 - Explore Data")
+3. Copy code from the [Student Guide](student-guide.md) into code cells
+4. Run cells with **Shift+Enter**
+
+The Student Guide contains all the code you need for each step of the ML lifecycle.
 
 ## Step 6: Register Data Connection
 
@@ -249,13 +243,13 @@ In JupyterLab:
 
 The S3 data should now be accessible from notebooks using the connection.
 
-## Step 7: Configure Environment Variables
+## Step 7: Note Your Configuration Values
 
-The notebooks use environment variables to access AWS resources. You need to create a `.env` file in JupyterLab.
+The notebooks use your S3 bucket name to access data. Get these values from the CloudFormation stack outputs.
 
 ### 7.1 Get CloudFormation Stack Outputs
 
-First, get the values from the CloudFormation stack:
+Run these commands to get your resource values:
 
 ```bash
 # Get bucket name
@@ -273,53 +267,50 @@ aws cloudformation describe-stacks \
   --region eu-west-1
 ```
 
-### 7.2 Create .env File in JupyterLab
+### 7.2 Use Values in Notebooks
 
-1. In JupyterLab, click **File** → **New** → **Text File**
-2. Add the following content (replace with your actual values):
+When copying code from the Student Guide, replace placeholders with your actual values:
 
-```
-BUCKET_NAME=sagemaker-unified-overheat-demo-<account-id>
-EXECUTION_ROLE=arn:aws:iam::<account-id>:role/SageMakerExecutionRole-overheat-demo
-REGION=eu-west-1
-```
+```python
+# Replace <account-id> with your AWS account ID
+bucket_name = "sagemaker-unified-overheat-demo-<account-id>"
 
-3. Click **File** → **Save As** and save as `.env` (note the leading dot)
-4. The file should be saved in `/shared/.env` for persistence
-
-**Example .env file:**
-```
-BUCKET_NAME=sagemaker-unified-overheat-demo-792641153717
-EXECUTION_ROLE=arn:aws:iam::792641153717:role/SageMakerExecutionRole-overheat-demo
-REGION=eu-west-1
+# Example with real account ID:
+bucket_name = "sagemaker-unified-overheat-demo-792641153717"
 ```
 
 ### 7.3 Verify Configuration
 
-Run this in a notebook cell to verify:
+Run this in a notebook cell to verify your S3 access:
 
 ```python
-from dotenv import load_dotenv
-import os
+import boto3
 
-load_dotenv()
-print(f"Using bucket: {os.getenv('BUCKET_NAME')}")
-print(f"Using role: {os.getenv('EXECUTION_ROLE')}")
-print(f"Region: {os.getenv('REGION')}")
+bucket_name = "sagemaker-unified-overheat-demo-<account-id>"  # Replace with your bucket
+s3 = boto3.client('s3')
+response = s3.list_objects_v2(Bucket=bucket_name, Prefix='data/raw/')
+for obj in response.get('Contents', []):
+    print(f"Found: {obj['Key']} ({obj['Size']:,} bytes)")
 ```
 
-You should see your bucket name, role ARN, and region printed.
+You should see `data/raw/machines.csv` listed.
 
 ## Troubleshooting
 
-### JupyterLab won't start
+### Notebook compute not starting
 
-**Issue**: "Connecting to space" takes too long or fails
+**Issue**: Notebook shows "Starting..." for a long time
 
 **Solution**:
-- Wait up to 5 minutes for first-time initialization
-- Check the space configuration in **Configure space** button
-- Try refreshing the page
+- Wait up to 2 minutes for the compute environment to initialize
+- The status bar at the bottom shows "Ready" when available
+- Try refreshing the page if it takes longer
+
+### JupyterLab not working
+
+**Issue**: JupyterLab shows "Domain does not exist" error
+
+**Solution**: JupyterLab requires additional SageMaker Studio domain configuration. Use the built-in **Notebooks** feature instead, which works out of the box.
 
 ### "No environment found" error
 

@@ -22,28 +22,51 @@ By the end of this demo, you will:
 ## Prerequisites
 
 - SageMaker Unified Studio IAM-based domain created (see [Setup Guide](setup.md))
-- Notebooks uploaded to JupyterLab
-- Data uploaded to S3 bucket
-- `.env` file configured with bucket name, execution role, and region
+- Data uploaded to S3 bucket (via `deploy.sh` script)
+- Access to your project in SageMaker Unified Studio
+
+> **Important**: Always use the **Manager role** (esadeis_IsbManagersPS) when accessing AWS Console and SageMaker Unified Studio. This role has the necessary permissions for all operations in this guide.
 
 ## Getting Started
 
-### Upload Notebooks to JupyterLab
+### Access Notebooks in Unified Studio
 
-1. In JupyterLab, click the **Upload Files** button in the file browser
-2. Select all 8 notebooks from the `notebooks/` directory and `inference.py`
-3. Files appear in `/shared/` directory
+SageMaker Unified Studio has a **built-in Notebooks** feature that provides a fully managed Python environment with access to your S3 data.
 
-![Notebooks uploaded to JupyterLab](images/11-notebooks-uploaded.png)
+1. In your project, click **Notebooks** in the left sidebar
+2. Click **Create notebook** to create a new notebook
+3. Name your notebook (e.g., "01 - Explore Data")
+4. The notebook opens with a Python compute environment ready
 
-### Configure Environment
+![Notebooks page in Unified Studio](images/11-notebooks-page.png)
 
-Create a `.env` file with your CloudFormation outputs:
+> **Note**: The **JupyterLab** option in the IDEs section requires additional SageMaker Studio domain configuration. For this guide, we use the simpler built-in **Notebooks** feature which works out of the box.
 
-```
-BUCKET_NAME=sagemaker-unified-overheat-demo-<account-id>
-EXECUTION_ROLE=arn:aws:iam::<account-id>:role/SageMakerExecutionRole-overheat-demo
-REGION=eu-west-1
+### Understanding the Notebook Interface
+
+The built-in notebook interface provides:
+- **Python cells**: Write and execute Python code
+- **Markdown cells**: Add documentation and notes
+- **Compute info**: Shows Python version (3.11), CPU (2 vCPU), and memory (4 GiB)
+- **Auto-save**: Notebooks save automatically
+
+![Notebook interface](images/12-notebook-interface.png)
+
+### Working with S3 Data
+
+Your S3 bucket is accessible via boto3. Get your bucket name from the CloudFormation outputs:
+
+```python
+import boto3
+
+# Your bucket name from CloudFormation outputs
+bucket_name = "sagemaker-unified-overheat-demo-<account-id>"
+
+# List objects in the bucket
+s3 = boto3.client('s3')
+response = s3.list_objects_v2(Bucket=bucket_name, Prefix='data/raw/')
+for obj in response.get('Contents', []):
+    print(f"Found: {obj['Key']} ({obj['Size']:,} bytes)")
 ```
 
 ## The ML Lifecycle: 10 Steps
@@ -82,38 +105,21 @@ Expected output:
 
 ### Step 2: Explore the Data
 
-**SageMaker Unified Studio Component**: Notebooks (JupyterLab)
+**SageMaker Unified Studio Component**: Notebooks
 
-**Notebook**: `01_explore_data.ipynb`
+**What you'll learn**: How to load data from S3 and perform exploratory data analysis (EDA)
 
-**What you'll learn**: How to load data from the catalog and perform exploratory data analysis (EDA)
+#### Create the Notebook
 
-#### Open the Notebook
+1. Click **Notebooks** in the left sidebar
+2. Click **Create notebook**
+3. Name it "01 - Explore Data"
 
-1. In JupyterLab, double-click `01_explore_data.ipynb`
-2. The notebook opens with the Python kernel ready
+#### Add Code Cells
 
-![Notebook 01 opened in JupyterLab](images/12-notebook-01-before-execution.png)
+Copy and paste the following code into cells. Press **Shift+Enter** to run each cell, or click the **Run** button.
 
-#### Execute the Notebook
-
-Run all cells with **Run → Run All Cells** or use **Shift+Enter** for each cell.
-
-**Cell 1 - Load environment:**
-
-![Environment loaded with bucket name](images/13-notebook-01-cell1-output.png)
-
-**Cell 2 - Load data from S3:**
-
-![Data loaded: 216,000 rows](images/14-notebook-01-cell2-data-loaded.png)
-
-**Cell 5-7 - Statistics and checks:**
-
-![Data statistics output](images/15-notebook-01-stats-output.png)
-
-**Completed notebook:**
-
-![Notebook 01 fully executed](images/16-notebook-01-completed.png)
+![Notebook 01 - Exploring data](images/13-notebook-01-explore.png)
 
 #### Key Code Cells
 
@@ -171,19 +177,18 @@ Expected: ~8-10%
 
 ### Step 3: Data Cleaning
 
-**SageMaker Component**: Data Processing Jobs (or notebook for simplicity)
-
-**Notebook**: `02_clean_data.ipynb`
+**SageMaker Component**: Notebooks (Data Processing)
 
 **What you'll learn**: How to handle missing data and prepare data for ML
 
-#### Open and Execute the Notebook
+#### Create the Notebook
 
-![Notebook 02 before execution](images/17-notebook-02-before-execution.png)
+1. Click **Create notebook**
+2. Name it "02 - Clean Data"
 
-Run all cells to clean the data and save to S3.
+#### Add Code Cells
 
-![Notebook 02 completed](images/18-notebook-02-completed.png)
+Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
 
 #### Cleaning Operations
 
@@ -224,19 +229,18 @@ Answer: Parquet is columnar, compressed, and faster to read for ML workloads.
 
 ### Step 4: Feature Engineering
 
-**SageMaker Component**: Feature engineering in notebooks or SageMaker Feature Store
-
-**Notebook**: `03_feature_engineering.ipynb`
+**SageMaker Component**: Notebooks (Feature Engineering)
 
 **What you'll learn**: How to create features that improve model performance
 
-#### Open and Execute the Notebook
+#### Create the Notebook
 
-![Notebook 03 before execution](images/19-notebook-03-before-execution.png)
+1. Click **Create notebook**
+2. Name it "03 - Feature Engineering"
 
-Run all cells to create features and save the feature dataset.
+#### Add Code Cells
 
-![Notebook 03 completed](images/20-notebook-03-completed.png)
+Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
 
 #### Create the Key Feature
 
@@ -298,19 +302,18 @@ df_final.to_parquet(output_path, index=False)
 
 ### Step 5: Training the Model
 
-**SageMaker Component**: Training Jobs
-
-**Notebook**: `04_train_model.ipynb`
+**SageMaker Component**: Notebooks (Training)
 
 **What you'll learn**: How to train a model and evaluate it
 
-#### Open and Execute the Notebook
+#### Create the Notebook
 
-![Notebook 04 before execution](images/21-notebook-04-before-execution.png)
+1. Click **Create notebook**
+2. Name it "04 - Train Model"
 
-Run all cells to train the model and save to S3.
+#### Add Code Cells
 
-![Notebook 04 completed](images/21-notebook-04-completed.png)
+Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
 
 #### Train/Test Split
 
@@ -389,15 +392,16 @@ s3_model_path = f's3://{bucket_name}/models/logistic_regression/model.pkl'
 
 **SageMaker Component**: MLflow
 
-**Notebook**: `05_mlflow_tracking.ipynb`
-
 **What you'll learn**: How to track experiments for reproducibility
 
-#### Execute the Notebook
+#### Create the Notebook
 
-Run all cells to log the experiment with MLflow.
+1. Click **Create notebook**
+2. Name it "05 - MLflow Tracking"
 
-![Notebook 05 completed](images/22-notebook-05-completed.png)
+#### Add Code Cells
+
+Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
 
 #### Setup MLflow
 
@@ -452,15 +456,16 @@ In SageMaker Unified Studio:
 
 **SageMaker Component**: Model Registry
 
-**Notebook**: `06_model_registry.ipynb`
-
 **What you'll learn**: How to version and manage models
 
-#### Execute the Notebook
+#### Create the Notebook
 
-Run all cells to register the model in SageMaker Model Registry.
+1. Click **Create notebook**
+2. Name it "06 - Model Registry"
 
-![Notebook 06 completed](images/23-notebook-06-completed.png)
+#### Add Code Cells
+
+Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
 
 #### Register Model
 
@@ -507,17 +512,18 @@ In SageMaker Unified Studio:
 
 ### Step 8: Validate the Model
 
-**SageMaker Component**: Model validation workflows
-
-**Notebook**: `07_validate_model.ipynb`
+**SageMaker Component**: Model Validation
 
 **What you'll learn**: How to validate models before deployment
 
-#### Execute the Notebook
+#### Create the Notebook
 
-Run all cells to validate the model before deployment.
+1. Click **Create notebook**
+2. Name it "07 - Validate Model"
 
-![Notebook 07 completed](images/24-notebook-07-completed.png)
+#### Add Code Cells
+
+Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
 
 #### Load Test Data
 
@@ -562,21 +568,20 @@ print(f"✓ Prediction distribution: {pred_dist.to_dict()}")
 
 **SageMaker Component**: Inference Endpoints
 
-**Notebook**: `08_deploy_endpoint.ipynb`
-
 **What you'll learn**: How to deploy a REST API for real-time predictions
 
-#### Execute the Notebook
+#### Create the Notebook
 
-Run all cells to deploy the model and test predictions.
+1. Click **Create notebook**
+2. Name it "08 - Deploy Endpoint"
 
-![Notebook 08 test success](images/25-notebook-08-test-success.png)
+#### Add Code Cells
+
+Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
 
 The endpoint test shows successful predictions:
-- Temperature 78°C → prediction=0 (no overheat), probability≈0%
-- Temperature 85°C → prediction=1 (overheat), probability=100%
-
-![Notebook 08 completed](images/26-notebook-08-completed.png)
+- Temperature 78°C → prediction=0 (no overheat), low probability
+- Temperature 85°C → prediction=1 (overheat), high probability
 
 #### Create Inference Script
 
@@ -767,22 +772,27 @@ In SageMaker Unified Studio:
 
 ## Troubleshooting
 
-### Notebook kernel crashes
+### Notebook compute not starting
 
-**Solution**: Restart kernel and re-run cells
-
-```python
-# In notebook
-%reset -f
-```
+**Solution**: Wait a moment for the compute environment to initialize. The status bar at the bottom shows "Ready" when the environment is available.
 
 ### S3 access denied
 
-**Solution**: Check execution role permissions
+**Solution**: Verify you're using the Manager role (esadeis_IsbManagersPS) and that the S3 bucket exists.
 
-```bash
-aws iam get-role --role-name <execution-role-name>
+```python
+# Test S3 access
+import boto3
+s3 = boto3.client('s3')
+response = s3.list_buckets()
+print([b['Name'] for b in response['Buckets']])
 ```
+
+### JupyterLab not working
+
+**Issue**: JupyterLab requires a SageMaker Studio domain which may not be configured.
+
+**Solution**: Use the built-in **Notebooks** feature instead. It provides the same Python environment without additional configuration.
 
 ### Endpoint deployment fails
 
@@ -799,6 +809,14 @@ aws logs tail /aws/sagemaker/Endpoints/machine-overheat-endpoint --follow
 ```python
 # Check class distribution
 y_train.value_counts(normalize=True)
+```
+
+### Package not found
+
+**Solution**: Install packages in the notebook cell
+
+```python
+%pip install package-name
 ```
 
 ---

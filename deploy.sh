@@ -24,7 +24,7 @@ echo "Step 2: Creating project resources..."
 aws cloudformation create-stack \
   --stack-name $STACK_NAME \
   --template-body file://cloudformation/project-resources.yaml \
-  --capabilities CAPABILITY_IAM \
+  --capabilities CAPABILITY_NAMED_IAM \
   --region $REGION \
   2>/dev/null || echo "  Stack already exists or creation failed"
 
