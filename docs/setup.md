@@ -195,36 +195,95 @@ The IAM-based domain automatically creates an admin project. In the portal:
 - **Models**: Model registry
 - **Inference endpoints**: Deployed models
 
-## Step 5: Access Notebooks
+## Step 5: Access JupyterLab
 
-### 5.1 Open Notebooks
+### 5.1 Open JupyterLab
 
 1. In the Unified Studio portal, look at the left sidebar
-2. Click **Notebooks** (not JupyterLab)
-3. Click **Create notebook** to start a new notebook
+2. Click **JupyterLab** (under IDEs section)
+3. Wait for JupyterLab to initialize (first time may take 1-2 minutes)
 
-![Unified Studio Portal](images/03-unified-studio-portal.png)
+![JupyterLab Interface](screenshots/04-jupyterlab-interface.png)
 
-The built-in Notebooks feature provides:
-- Python 3.11 environment
-- 2 vCPU, 4 GiB memory
-- Direct S3 access via boto3
-- Auto-save functionality
-
-> **Note**: The **JupyterLab** option under IDEs requires additional SageMaker Studio domain configuration. For this guide, we use the simpler built-in **Notebooks** feature which works out of the box.
+JupyterLab provides:
+- Full Jupyter notebook environment
+- File browser for managing notebooks
+- Terminal access for shell commands
+- Git integration
+- Multiple kernels support
 
 > **Important**: Always use the **Manager role** (esadeis_IsbManagersPS) when accessing AWS Console and SageMaker Unified Studio.
 
-### 5.2 Create Notebooks from Code
+### 5.2 Upload Notebooks
 
-Instead of uploading .ipynb files, you'll create notebooks and paste code from the Student Guide:
+Upload the pre-built notebooks from the `notebooks/` directory:
 
-1. Click **Create notebook**
-2. Name it (e.g., "01 - Explore Data")
-3. Copy code from the [Student Guide](student-guide.md) into code cells
-4. Run cells with **Shift+Enter**
+1. Click the **Upload Files** button in the JupyterLab toolbar
+2. Navigate to the `notebooks/` folder from this project
+3. Select all 8 notebooks (01_explore_data.ipynb through 08_deploy_endpoint.ipynb)
+4. Click **Open** to upload
 
-The Student Guide contains all the code you need for each step of the ML lifecycle.
+![Upload Files](screenshots/05-jupyterlab-upload.png)
+
+The notebooks will appear in the file browser. Double-click any notebook to open it.
+
+![Notebooks Uploaded](screenshots/06-notebooks-uploaded.png)
+
+### 5.3 Create .env Configuration File (CRITICAL)
+
+> **IMPORTANT**: You MUST create this file before running any notebooks, or they will fail with "NoSuchBucket" errors.
+
+The notebooks use `python-dotenv` to load configuration. Create a `.env` file in JupyterLab:
+
+1. In JupyterLab, click **File** → **New** → **Text File**
+2. A new `untitled.txt` file opens in the editor
+3. Add the following content (replace `<account-id>` with your AWS account ID):
+
+```bash
+BUCKET_NAME=sagemaker-unified-overheat-demo-<account-id>
+REGION=eu-west-1
+```
+
+Example with real account ID:
+```bash
+BUCKET_NAME=sagemaker-unified-overheat-demo-792641153717
+REGION=eu-west-1
+```
+
+4. Save the file: **Ctrl+S** (or **Cmd+S** on Mac)
+5. When prompted to rename, enter `.env` as the filename
+6. Click **Rename and Save**
+
+Alternatively, right-click on `untitled.txt` in the file browser and select **Rename**, then enter `.env`.
+
+**Get your account ID** from the CloudFormation outputs:
+```bash
+aws cloudformation describe-stacks \
+  --stack-name sagemaker-overheat-project \
+  --query 'Stacks[0].Outputs[?OutputKey==`DataBucketName`].OutputValue' \
+  --output text \
+  --region eu-west-1
+```
+
+### 5.4 Verify Configuration
+
+Open any notebook and run the first cell to verify the configuration works:
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+bucket_name = os.getenv('BUCKET_NAME')
+print(f"Using bucket: {bucket_name}")
+```
+
+Expected output:
+```
+Using bucket: sagemaker-unified-overheat-demo-792641153717
+```
+
+If you see `Using bucket: None`, the .env file is not configured correctly.
 
 ## Step 6: Register Data Connection
 
@@ -297,20 +356,24 @@ You should see `data/raw/machines.csv` listed.
 
 ## Troubleshooting
 
-### Notebook compute not starting
+### JupyterLab not starting
 
-**Issue**: Notebook shows "Starting..." for a long time
+**Issue**: JupyterLab shows "Starting..." for a long time
 
 **Solution**:
 - Wait up to 2 minutes for the compute environment to initialize
-- The status bar at the bottom shows "Ready" when available
+- The kernel status shows "Idle" when ready
 - Try refreshing the page if it takes longer
 
-### JupyterLab not working
+### JupyterLab shows validation error
 
-**Issue**: JupyterLab shows "Domain does not exist" error
+**Issue**: JupyterLab shows "Validation error" or "space has failed to initialize"
 
-**Solution**: JupyterLab requires additional SageMaker Studio domain configuration. Use the built-in **Notebooks** feature instead, which works out of the box.
+**Solution**: This indicates domain environment corruption. Delete and recreate the domain:
+1. Go to Domains page in DataZone console
+2. Click Actions → Delete on the IAM-based domain
+3. Confirm deletion
+4. Set up a new domain
 
 ### "No environment found" error
 

@@ -29,38 +29,102 @@ By the end of this demo, you will:
 
 ## Getting Started
 
-### Access Notebooks in Unified Studio
+### Access JupyterLab in Unified Studio
 
-SageMaker Unified Studio has a **built-in Notebooks** feature that provides a fully managed Python environment with access to your S3 data.
+SageMaker Unified Studio includes **JupyterLab**, a full-featured Jupyter environment for running notebooks.
 
-1. In your project, click **Notebooks** in the left sidebar
-2. Click **Create notebook** to create a new notebook
-3. Name your notebook (e.g., "01 - Explore Data")
-4. The notebook opens with a Python compute environment ready
+1. In your project, click **JupyterLab** in the left sidebar (under IDEs)
+2. Wait for JupyterLab to initialize (first time may take 1-2 minutes)
+3. The JupyterLab interface opens with file browser and launcher
 
-![Notebooks page in Unified Studio](images/11-notebooks-page.png)
+![JupyterLab Interface](screenshots/04-jupyterlab-interface.png)
 
-> **Note**: The **JupyterLab** option in the IDEs section requires additional SageMaker Studio domain configuration. For this guide, we use the simpler built-in **Notebooks** feature which works out of the box.
+### Upload Notebooks
 
-### Understanding the Notebook Interface
+This project includes pre-built notebooks in the `notebooks/` directory. Upload them to JupyterLab:
 
-The built-in notebook interface provides:
-- **Python cells**: Write and execute Python code
-- **Markdown cells**: Add documentation and notes
-- **Compute info**: Shows Python version (3.11), CPU (2 vCPU), and memory (4 GiB)
-- **Auto-save**: Notebooks save automatically
+1. Click the **Upload Files** button in the JupyterLab toolbar (arrow pointing up)
+2. Navigate to the `notebooks/` folder from this project
+3. Select all 8 notebooks (01_explore_data.ipynb through 08_deploy_endpoint.ipynb)
+4. Click **Open** to upload
 
-![Notebook interface](images/12-notebook-interface.png)
+![Upload Files Button](screenshots/05-jupyterlab-upload.png)
+
+The notebooks will appear in the file browser on the left.
+
+![Notebooks Uploaded](screenshots/06-notebooks-uploaded.png)
+
+### Understanding the JupyterLab Interface
+
+JupyterLab provides:
+- **File browser**: Navigate and manage files (left sidebar)
+- **Notebook editor**: Write and execute code cells
+- **Terminal**: Run shell commands
+- **Kernel selector**: Choose Python environment
+- **Git integration**: Version control (optional)
+
+### Create .env Configuration File (CRITICAL - DO THIS FIRST!)
+
+> **WARNING**: You MUST create this file before running any notebooks. Without it, notebooks will fail with `NoSuchBucket` or `Using bucket: None` errors.
+
+The notebooks use `python-dotenv` to load your S3 bucket configuration. Create the `.env` file:
+
+**Step-by-step:**
+
+1. In JupyterLab, click **File** → **New** → **Text File**
+2. A new `untitled.txt` file opens in the editor
+3. Type the following content (replace `<account-id>` with your AWS account ID):
+
+```bash
+BUCKET_NAME=sagemaker-unified-overheat-demo-<account-id>
+REGION=eu-west-1
+```
+
+**Example** with real account ID `792641153717`:
+```bash
+BUCKET_NAME=sagemaker-unified-overheat-demo-792641153717
+REGION=eu-west-1
+```
+
+4. Press **Ctrl+S** (or **Cmd+S** on Mac) to save
+5. When the rename dialog appears, change `untitled.txt` to `.env`
+6. Click **Rename and Save**
+
+**Alternative method:** Save first as `untitled.txt`, then right-click on the file in the file browser → **Rename** → enter `.env`
+
+**Find your account ID** by running this in your local terminal:
+```bash
+aws cloudformation describe-stacks \
+  --stack-name sagemaker-overheat-project \
+  --query 'Stacks[0].Outputs[?OutputKey==`DataBucketName`].OutputValue' \
+  --output text \
+  --region eu-west-1
+```
+
+**Verify your .env file works** by running this in a notebook cell:
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+bucket_name = os.getenv('BUCKET_NAME')
+print(f"Using bucket: {bucket_name}")
+# Should print: Using bucket: sagemaker-unified-overheat-demo-792641153717
+```
+
+If you see `Using bucket: None`, the .env file is missing or misconfigured.
 
 ### Working with S3 Data
 
-Your S3 bucket is accessible via boto3. Get your bucket name from the CloudFormation outputs:
+Your S3 bucket is accessible via boto3. The notebooks use python-dotenv to load configuration:
 
 ```python
 import boto3
+from dotenv import load_dotenv
+import os
 
-# Your bucket name from CloudFormation outputs
-bucket_name = "sagemaker-unified-overheat-demo-<account-id>"
+load_dotenv()
+bucket_name = os.getenv('BUCKET_NAME')
 
 # List objects in the bucket
 s3 = boto3.client('s3')
@@ -105,21 +169,17 @@ Expected output:
 
 ### Step 2: Explore the Data
 
-**SageMaker Unified Studio Component**: Notebooks
+**SageMaker Unified Studio Component**: JupyterLab
 
 **What you'll learn**: How to load data from S3 and perform exploratory data analysis (EDA)
 
-#### Create the Notebook
+#### Open the Notebook
 
-1. Click **Notebooks** in the left sidebar
-2. Click **Create notebook**
-3. Name it "01 - Explore Data"
+1. In JupyterLab file browser, double-click **01_explore_data.ipynb**
+2. The notebook opens in a new tab
+3. Run cells with **Shift+Enter** or click the **Run** button
 
-#### Add Code Cells
-
-Copy and paste the following code into cells. Press **Shift+Enter** to run each cell, or click the **Run** button.
-
-![Notebook 01 - Exploring data](images/13-notebook-01-explore.png)
+![Notebook 01 - Exploring data](screenshots/07-notebook-open.png)
 
 #### Key Code Cells
 
@@ -177,18 +237,14 @@ Expected: ~8-10%
 
 ### Step 3: Data Cleaning
 
-**SageMaker Component**: Notebooks (Data Processing)
+**SageMaker Component**: JupyterLab (Data Processing)
 
 **What you'll learn**: How to handle missing data and prepare data for ML
 
-#### Create the Notebook
+#### Open the Notebook
 
-1. Click **Create notebook**
-2. Name it "02 - Clean Data"
-
-#### Add Code Cells
-
-Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
+1. In JupyterLab file browser, double-click **02_clean_data.ipynb**
+2. Run each cell with **Shift+Enter**
 
 #### Cleaning Operations
 
@@ -229,18 +285,14 @@ Answer: Parquet is columnar, compressed, and faster to read for ML workloads.
 
 ### Step 4: Feature Engineering
 
-**SageMaker Component**: Notebooks (Feature Engineering)
+**SageMaker Component**: JupyterLab (Feature Engineering)
 
 **What you'll learn**: How to create features that improve model performance
 
-#### Create the Notebook
+#### Open the Notebook
 
-1. Click **Create notebook**
-2. Name it "03 - Feature Engineering"
-
-#### Add Code Cells
-
-Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
+1. In JupyterLab file browser, double-click **03_feature_engineering.ipynb**
+2. Run each cell with **Shift+Enter**
 
 #### Create the Key Feature
 
@@ -302,18 +354,14 @@ df_final.to_parquet(output_path, index=False)
 
 ### Step 5: Training the Model
 
-**SageMaker Component**: Notebooks (Training)
+**SageMaker Component**: JupyterLab (Training)
 
 **What you'll learn**: How to train a model and evaluate it
 
-#### Create the Notebook
+#### Open the Notebook
 
-1. Click **Create notebook**
-2. Name it "04 - Train Model"
-
-#### Add Code Cells
-
-Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
+1. In JupyterLab file browser, double-click **04_train_model.ipynb**
+2. Run each cell with **Shift+Enter**
 
 #### Train/Test Split
 
@@ -394,14 +442,10 @@ s3_model_path = f's3://{bucket_name}/models/logistic_regression/model.pkl'
 
 **What you'll learn**: How to track experiments for reproducibility
 
-#### Create the Notebook
+#### Open the Notebook
 
-1. Click **Create notebook**
-2. Name it "05 - MLflow Tracking"
-
-#### Add Code Cells
-
-Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
+1. In JupyterLab file browser, double-click **05_mlflow_tracking.ipynb**
+2. Run each cell with **Shift+Enter**
 
 #### Setup MLflow
 
@@ -458,14 +502,10 @@ In SageMaker Unified Studio:
 
 **What you'll learn**: How to version and manage models
 
-#### Create the Notebook
+#### Open the Notebook
 
-1. Click **Create notebook**
-2. Name it "06 - Model Registry"
-
-#### Add Code Cells
-
-Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
+1. In JupyterLab file browser, double-click **06_model_registry.ipynb**
+2. Run each cell with **Shift+Enter**
 
 #### Register Model
 
@@ -516,14 +556,10 @@ In SageMaker Unified Studio:
 
 **What you'll learn**: How to validate models before deployment
 
-#### Create the Notebook
+#### Open the Notebook
 
-1. Click **Create notebook**
-2. Name it "07 - Validate Model"
-
-#### Add Code Cells
-
-Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
+1. In JupyterLab file browser, double-click **07_validate_model.ipynb**
+2. Run each cell with **Shift+Enter**
 
 #### Load Test Data
 
@@ -570,14 +606,10 @@ print(f"✓ Prediction distribution: {pred_dist.to_dict()}")
 
 **What you'll learn**: How to deploy a REST API for real-time predictions
 
-#### Create the Notebook
+#### Open the Notebook
 
-1. Click **Create notebook**
-2. Name it "08 - Deploy Endpoint"
-
-#### Add Code Cells
-
-Copy and paste the following code into cells. Run each cell with **Shift+Enter**.
+1. In JupyterLab file browser, double-click **08_deploy_endpoint.ipynb**
+2. Run each cell with **Shift+Enter**
 
 The endpoint test shows successful predictions:
 - Temperature 78°C → prediction=0 (no overheat), low probability
@@ -772,9 +804,41 @@ In SageMaker Unified Studio:
 
 ## Troubleshooting
 
-### Notebook compute not starting
+### NoSuchBucket or "Using bucket: None" Error
 
-**Solution**: Wait a moment for the compute environment to initialize. The status bar at the bottom shows "Ready" when the environment is available.
+**Issue**: Notebook fails with `NoSuchBucket: The specified bucket does not exist` or prints `Using bucket: None`
+
+**Cause**: The `.env` configuration file is missing or not configured correctly.
+
+**Solution**:
+1. Create a `.env` file in JupyterLab (see "Create .env Configuration File" section above)
+2. Make sure the file is named exactly `.env` (with the dot at the beginning)
+3. Verify the bucket name is correct (matches your CloudFormation output)
+4. **Restart the kernel** after creating the .env file: **Kernel** → **Restart Kernel**
+
+**Quick fix**: Run this in a notebook cell to verify your configuration:
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+bucket = os.getenv('BUCKET_NAME')
+print(f"Bucket: {bucket}")
+
+# If bucket is None, create .env file with:
+# BUCKET_NAME=sagemaker-unified-overheat-demo-YOUR_ACCOUNT_ID
+```
+
+### JupyterLab not starting
+
+**Issue**: JupyterLab shows "Validation error" or "space has failed to initialize"
+
+**Solution**: This indicates domain environment corruption. Delete and recreate the IAM-based domain:
+1. Go to https://eu-west-1.console.aws.amazon.com/datazone
+2. Click **Domains** in the left sidebar
+3. Select the IAM-based domain → Actions → Delete
+4. Type "confirm" and delete
+5. Click "Set up" to create a new domain
 
 ### S3 access denied
 
@@ -788,11 +852,13 @@ response = s3.list_buckets()
 print([b['Name'] for b in response['Buckets']])
 ```
 
-### JupyterLab not working
+### Kernel not starting
 
-**Issue**: JupyterLab requires a SageMaker Studio domain which may not be configured.
+**Issue**: JupyterLab kernel fails to start or stays in "Connecting" state
 
-**Solution**: Use the built-in **Notebooks** feature instead. It provides the same Python environment without additional configuration.
+**Solution**: Wait 1-2 minutes for the compute environment to initialize. If it persists, try:
+1. Click **Kernel** → **Restart Kernel**
+2. If that fails, close and reopen the notebook
 
 ### Endpoint deployment fails
 

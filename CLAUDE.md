@@ -141,15 +141,31 @@ s3://{bucket}/
 
 ## Environment Configuration
 
-Notebooks use `python-dotenv` to load configuration. Create `.env` file:
+**CRITICAL**: Notebooks use `python-dotenv` to load configuration. The `.env` file must be created **inside JupyterLab** (in the `/shared/` directory where notebooks are located), NOT in the local project folder.
+
+Create `.env` file in JupyterLab with:
 
 ```bash
-BUCKET_NAME=sagemaker-unified-overheat-demo-123456789012
-EXECUTION_ROLE=arn:aws:iam::123456789012:role/SageMakerExecutionRole-overheat-demo
+BUCKET_NAME=sagemaker-unified-overheat-demo-<account-id>
 REGION=eu-west-1
 ```
 
-See `docs/env-setup.md` for automatic generation from CloudFormation outputs.
+Example:
+```bash
+BUCKET_NAME=sagemaker-unified-overheat-demo-792641153717
+REGION=eu-west-1
+```
+
+**Steps in JupyterLab**:
+1. File → New → Text File
+2. Add the content above
+3. Ctrl+S to save
+4. Rename to `.env`
+5. Restart kernel if notebooks were already running
+
+Without this file, notebooks fail with `NoSuchBucket` or `Using bucket: None` errors.
+
+See `docs/env-setup.md` for detailed instructions.
 
 ## Key Code Patterns
 
