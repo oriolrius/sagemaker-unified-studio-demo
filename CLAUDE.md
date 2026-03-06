@@ -35,6 +35,7 @@ sagemaker-unified-studio-demo/
 ├── pyproject.toml               # Dependencies (includes python-dotenv)
 ├── deploy.sh                    # Automated deployment script
 ├── inference.py                 # SageMaker endpoint inference handler
+├── deploy_endpoint.py           # CLI script for endpoint deployment
 │
 ├── cloudformation/
 │   └── project-resources.yaml   # S3 bucket + IAM execution role

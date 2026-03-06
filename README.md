@@ -98,7 +98,8 @@ sagemaker-unified-studio-demo/
 │   ├── 05_mlflow_tracking.ipynb       # Step 6: Experiment tracking
 │   ├── 06_model_registry.ipynb        # Step 7: Register model
 │   ├── 07_validate_model.ipynb        # Step 8: Validation
-│   └── 08_deploy_endpoint.ipynb       # Step 9: Deployment
+│   ├── 08_deploy_endpoint.ipynb       # Step 9: Deployment
+│   └── 09_test_endpoint.ipynb         # Step 9: Advanced Testing
 ├── scripts/
 │   ├── generate_data.py               # Generate synthetic machines.csv
 │   ├── upload_to_s3.py                # Upload data to S3
@@ -107,6 +108,7 @@ sagemaker-unified-studio-demo/
 ├── data/
 │   └── .gitkeep                       # Generated data goes here
 ├── inference.py                       # SageMaker inference script
+├── deploy_endpoint.py                 # CLI script for endpoint deployment
 ├── pyproject.toml                     # Python dependencies (uv)
 ├── .python-version                    # Python 3.11
 ├── deploy.sh                          # Automated deployment script

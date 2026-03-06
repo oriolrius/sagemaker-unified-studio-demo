@@ -45,7 +45,7 @@ This project includes pre-built notebooks in the `notebooks/` directory. Upload 
 
 1. Click the **Upload Files** button in the JupyterLab toolbar (arrow pointing up)
 2. Navigate to the `notebooks/` folder from this project
-3. Select all 8 notebooks (01_explore_data.ipynb through 08_deploy_endpoint.ipynb)
+3. Select all 9 notebooks (01_explore_data.ipynb through 09_test_endpoint.ipynb)
 4. Click **Open** to upload
 
 ![Upload Files Button](screenshots/05-jupyterlab-upload.png)
@@ -712,6 +712,15 @@ Expected output:
 ```
 
 **Key concept**: The endpoint is a production-ready REST API. Any application can call it.
+
+#### Advanced Testing (Optional)
+
+For comprehensive endpoint testing, open **09_test_endpoint.ipynb**:
+
+- **Scenario testing**: Normal, overheating, and borderline temperatures
+- **Batch predictions**: Test multiple machines at once
+- **API integration**: Raw boto3 calls for external system integration
+- **Room temperature impact**: See how `temp_diff` affects predictions
 
 ---
 
