@@ -52,7 +52,7 @@ sagemaker-unified-studio-demo/
 │   ├── COMPLETE.md              # Outdated status file (can be removed)
 │   └── PROJECT_STATUS.md        # Outdated status file (can be removed)
 │
-├── notebooks/                   # 8 Jupyter notebooks for ML lifecycle
+├── notebooks/                   # 9 Jupyter notebooks for ML lifecycle
 │   ├── 01_explore_data.ipynb
 │   ├── 02_clean_data.ipynb
 │   ├── 03_feature_engineering.ipynb
@@ -60,7 +60,8 @@ sagemaker-unified-studio-demo/
 │   ├── 05_mlflow_tracking.ipynb
 │   ├── 06_model_registry.ipynb
 │   ├── 07_validate_model.ipynb
-│   └── 08_deploy_endpoint.ipynb
+│   ├── 08_deploy_endpoint.ipynb
+│   └── 09_test_endpoint.ipynb
 │
 └── scripts/
     ├── generate_data.py         # Generate synthetic machines.csv
@@ -83,20 +84,21 @@ sagemaker-unified-studio-demo/
 - `temp_diff = temperature - room_temp`
 - `overheat = temperature > 80` (target label)
 
-## ML Lifecycle (10 Steps)
+## ML Lifecycle (9 Notebooks)
 
-| Step | Notebook/Script | SageMaker Component |
-|------|-----------------|---------------------|
-| 1 | Data uploaded via `deploy.sh` | S3 + Data Catalog |
-| 2 | `01_explore_data.ipynb` | Notebooks (JupyterLab) |
-| 3 | `02_clean_data.ipynb` | Data Processing |
-| 4 | `03_feature_engineering.ipynb` | Feature Engineering |
-| 5 | `04_train_model.ipynb` | Training Jobs |
-| 6 | `05_mlflow_tracking.ipynb` | MLflow |
-| 7 | `06_model_registry.ipynb` | Model Registry |
-| 8 | `07_validate_model.ipynb` | Model Validation |
-| 9 | `08_deploy_endpoint.ipynb` | Inference Endpoints |
-| 10 | `scripts/create_pipeline.py` | SageMaker Pipelines |
+| Step | Notebook | SageMaker Component |
+|------|----------|---------------------|
+| 1 | `01_explore_data.ipynb` | Notebooks (JupyterLab) |
+| 2 | `02_clean_data.ipynb` | Data Processing |
+| 3 | `03_feature_engineering.ipynb` | Feature Engineering |
+| 4 | `04_train_model.ipynb` | Training Jobs |
+| 5 | `05_mlflow_tracking.ipynb` | MLflow |
+| 6 | `06_model_registry.ipynb` | Model Registry |
+| 7 | `07_validate_model.ipynb` | Model Validation |
+| 8 | `08_deploy_endpoint.ipynb` | Inference Endpoints |
+| 9 | `09_test_endpoint.ipynb` | Endpoint Testing |
+
+**Additional**: `scripts/create_pipeline.py` orchestrates the full workflow with SageMaker Pipelines.
 
 ## Quick Commands
 
