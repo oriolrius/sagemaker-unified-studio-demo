@@ -29,10 +29,12 @@ This repository contains 13 Jupyter notebooks that guide you through the complet
 
 | Step | Notebook | Purpose | Key Actions |
 |------|----------|---------|-------------|
-| 8 | `08_train_model.ipynb` | Model Training | Train LogisticRegression, evaluate metrics, save model |
-| 9 | `09_mlflow_tracking.ipynb` | Experiment Tracking | Log parameters, metrics, and model artifacts to MLflow |
+| 8 **OR** 9 | `08_train_model.ipynb` | Model Training (basic) | Train LogisticRegression, evaluate metrics, save model |
+| 8 **OR** 9 | `09_mlflow_tracking.ipynb` | Model Training + MLflow | Same training with experiment tracking |
 | 10 | `10_model_registry.ipynb` | Model Registry | Register model version for governance and lineage |
 | 11 | `11_validate_model.ipynb` | Model Validation | Accuracy checks (>85% threshold), prediction distribution |
+
+> **Note**: Notebooks 08 and 09 are **equivalent alternatives** - both train the same LogisticRegression model. The only difference is that notebook 09 includes MLflow experiment tracking (logging parameters, metrics, and model artifacts). **Choose one** based on whether you want to use MLflow.
 
 ### Phase 4: Deployment
 
