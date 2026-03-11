@@ -57,6 +57,7 @@ The notebooks will appear in the file browser on the left.
 ### Understanding the JupyterLab Interface
 
 JupyterLab provides:
+
 - **File browser**: Navigate and manage files (left sidebar)
 - **Notebook editor**: Write and execute code cells
 - **Terminal**: Run shell commands
@@ -81,6 +82,7 @@ REGION=eu-west-1
 ```
 
 **Example** with real account ID `792641153717`:
+
 ```bash
 BUCKET_NAME=sagemaker-unified-overheat-demo-792641153717
 REGION=eu-west-1
@@ -93,6 +95,7 @@ REGION=eu-west-1
 **Alternative method:** Save first as `untitled.txt`, then right-click on the file in the file browser → **Rename** → enter `.env`
 
 **Find your account ID** by running this in your local terminal:
+
 ```bash
 aws cloudformation describe-stacks \
   --stack-name sagemaker-overheat-project \
@@ -102,6 +105,7 @@ aws cloudformation describe-stacks \
 ```
 
 **Verify your .env file works** by running this in a notebook cell:
+
 ```python
 from dotenv import load_dotenv
 import os
@@ -120,17 +124,34 @@ Your S3 bucket is accessible via boto3. The notebooks use python-dotenv to load 
 
 ```python
 import boto3
+from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 bucket_name = os.getenv('BUCKET_NAME')
+region = os.getenv('AWS_DEFAULT_REGION')
+s3 = boto3.client('s3')
+
+# Check if bucket exists, create if not
+try:
+    s3.head_bucket(Bucket=bucket_name)
+except ClientError as e:
+    if e.response['Error']['Code'] == '404':
+        print(f"Bucket {bucket_name} doesn't exist. Creating...")
+        if region == 'us-east-1':
+            s3.create_bucket(Bucket=bucket_name)
+        else:
+            s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': region})
+        print(f"Bucket {bucket_name} created successfully")
+    else:
+        raise
 
 # List objects in the bucket
-s3 = boto3.client('s3')
 response = s3.list_objects_v2(Bucket=bucket_name, Prefix='data/raw/')
 for obj in response.get('Contents', []):
     print(f"Found: {obj['Key']} ({obj['Size']:,} bytes)")
+
 ```
 
 ## The ML Lifecycle: 10 Steps
@@ -159,6 +180,7 @@ aws s3 ls s3://$BUCKET_NAME/data/raw/
 ```
 
 Expected output:
+
 ```
 2026-03-05 10:59:00     245678 machines.csv
 ```
@@ -337,7 +359,7 @@ df_final.head()
 ```
 
 | temperature | temp_diff | overheat |
-|-------------|-----------|----------|
+| ----------- | --------- | -------- |
 | 60          | 35        | 0        |
 | 62          | 37        | 0        |
 | 85          | 60        | 1        |
@@ -465,29 +487,30 @@ with mlflow.start_run(run_name="logistic_regression_v1"):
     mlflow.log_param("model_type", "LogisticRegression")
     mlflow.log_param("test_size", 0.2)
     mlflow.log_param("random_state", 42)
-    
+  
     # Train model
     model = LogisticRegression(random_state=42)
     model.fit(X_train, y_train)
-    
+  
     # Evaluate
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
-    
+  
     # Log metrics
     mlflow.log_metric("accuracy", accuracy)
     mlflow.log_metric("train_samples", len(X_train))
     mlflow.log_metric("test_samples", len(X_test))
-    
+  
     # Log model
     mlflow.sklearn.log_model(model, "model")
-    
+  
     print(f"Run logged with accuracy: {accuracy:.3f}")
 ```
 
 #### View Experiments
 
 In SageMaker Unified Studio:
+
 1. Click **Experiments** in the left sidebar
 2. Find "machine-overheat" experiment
 3. View runs, metrics, and parameters
@@ -542,6 +565,7 @@ print(f"Model registered: {model_package.model_package_arn}")
 #### View Model Registry
 
 In SageMaker Unified Studio:
+
 1. Click **Models** in the left sidebar
 2. Find "machine-overheat-models" group
 3. View version 1 with metadata
@@ -612,6 +636,7 @@ print(f"✓ Prediction distribution: {pred_dist.to_dict()}")
 2. Run each cell with **Shift+Enter**
 
 The endpoint test shows successful predictions:
+
 - Temperature 78°C → prediction=0 (no overheat), low probability
 - Temperature 85°C → prediction=1 (overheat), high probability
 
@@ -682,6 +707,7 @@ print(f"Prediction: {response}")
 ```
 
 Expected output:
+
 ```json
 {
   "prediction": 0,
@@ -704,6 +730,7 @@ print(f"Prediction: {response}")
 ```
 
 Expected output:
+
 ```json
 {
   "prediction": 1,
@@ -765,6 +792,7 @@ python scripts/create_pipeline.py
 #### Monitor Pipeline Execution
 
 In SageMaker Unified Studio:
+
 1. Click **Pipelines** in the left sidebar
 2. Find "machine-overheat-pipeline"
 3. View execution graph and logs
@@ -820,12 +848,14 @@ In SageMaker Unified Studio:
 **Cause**: The `.env` configuration file is missing or not configured correctly.
 
 **Solution**:
+
 1. Create a `.env` file in JupyterLab (see "Create .env Configuration File" section above)
 2. Make sure the file is named exactly `.env` (with the dot at the beginning)
 3. Verify the bucket name is correct (matches your CloudFormation output)
 4. **Restart the kernel** after creating the .env file: **Kernel** → **Restart Kernel**
 
 **Quick fix**: Run this in a notebook cell to verify your configuration:
+
 ```python
 from dotenv import load_dotenv
 import os
@@ -843,6 +873,7 @@ print(f"Bucket: {bucket}")
 **Issue**: JupyterLab shows "Validation error" or "space has failed to initialize"
 
 **Solution**: This indicates domain environment corruption. Delete and recreate the IAM-based domain:
+
 1. Go to https://eu-west-1.console.aws.amazon.com/datazone
 2. Click **Domains** in the left sidebar
 3. Select the IAM-based domain → Actions → Delete
@@ -866,6 +897,7 @@ print([b['Name'] for b in response['Buckets']])
 **Issue**: JupyterLab kernel fails to start or stays in "Connecting" state
 
 **Solution**: Wait 1-2 minutes for the compute environment to initialize. If it persists, try:
+
 1. Click **Kernel** → **Restart Kernel**
 2. If that fails, close and reopen the notebook
 
