@@ -1,0 +1,109 @@
+<mxfile host="65bd71144e">
+    <diagram id="sagemaker-arch" name="SageMaker Architecture">
+        <mxGraphModel dx="1438" dy="672" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Amazon SageMaker" style="text;html=1;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#232F3E;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="30" width="300" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="subtitle" value="The overarching service for machine learning, data &amp; analytics, and generative AI" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="65" width="500" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="unified-container" value="" style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8C4FFF;strokeWidth=2;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="100" width="1020" height="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="unified-title" value="SageMaker Unified Studio" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#8C4FFF;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="110" width="260" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="unified-subtitle" value="The one development environment for them all" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="135" width="300" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="sql" value="SQL Analytics" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="170" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="sql-sub" value="Redshift" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="210" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="data-proc" value="Data Processing" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="190" y="170" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="data-proc-sub" value="EMR&#xa;Glue&#xa;Athena" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="190" y="200" width="120" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="model-dev" value="Model Development" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#8C4FFF;strokeColor=#8C4FFF;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=5;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="170" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="model-dev-sub" value="SageMaker AI&#xa;(UI: SageMaker&#xa;Studio Classic)" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="198" width="140" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="genai" value="Gen AI Development" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="470" y="170" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="genai-sub" value="Bedrock&#xa;(UI: Bedrock IDE,&#xa;in Unified Studio)" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="470" y="198" width="140" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="streaming" value="Streaming" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="170" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="streaming-sub" value="Kinesis&#xa;MSK" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="200" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="streaming-badge" value="Coming soon" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#D13212;strokeColor=#D13212;fontColor=#FFFFFF;fontSize=14;fontStyle=0;" parent="1" vertex="1">
+                    <mxGeometry x="635" y="232" width="90" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="bi" value="Business Intelligence" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="750" y="170" width="130" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="bi-sub" value="QuickSight" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="750" y="210.5" width="130" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="bi-badge" value="Coming soon" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#D13212;strokeColor=#D13212;fontColor=#FFFFFF;fontSize=14;fontStyle=0;" parent="1" vertex="1">
+                    <mxGeometry x="770" y="232" width="90" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="search" value="Search Analytics" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="890" y="170" width="150" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="search-sub" value="Amazon&#xa;OpenSearch" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="890" y="200" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="search-badge" value="Coming soon" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#D13212;strokeColor=#D13212;fontColor=#FFFFFF;fontSize=14;fontStyle=0;" parent="1" vertex="1">
+                    <mxGeometry x="920" y="232" width="90" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="governance" value="Data and AI Governance" style="rounded=1;arcSize=5;whiteSpace=wrap;html=1;fillColor=#8C4FFF;strokeColor=#8C4FFF;strokeWidth=1;fontStyle=1;fontSize=14;fontColor=#FFFFFF;verticalAlign=top;spacingTop=8;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="280" width="980" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="governance-sub" value="SageMaker Catalog (built on DataZone)" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="305" width="980" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="lakehouse" value="Lakehouse" style="rounded=1;arcSize=5;whiteSpace=wrap;html=1;fillColor=#232F3E;strokeColor=#232F3E;strokeWidth=1;fontStyle=1;fontSize=14;fontColor=#FFFFFF;verticalAlign=top;spacingTop=8;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="360" width="980" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="lakehouse-sub" value="Access data from S3 data lakes and Redshift data warehouses" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="385" width="980" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-title" value="Legend" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#232F3E;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="440" width="60" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-ml" value="" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#8C4FFF;strokeColor=#8C4FFF;strokeWidth=1;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="465" width="20" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-ml-text" value="ML/AI focused (SageMaker AI)" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="85" y="465" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-analytics" value="" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="465" width="20" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-analytics-text" value="Data &amp;amp; Analytics services" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="305" y="465" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-coming" value="Coming soon" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#D13212;strokeColor=#D13212;fontColor=#FFFFFF;fontSize=13;fontStyle=0;" parent="1" vertex="1">
+                    <mxGeometry x="470" y="465" width="80" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-coming-text" value="Announced, not yet available" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="555" y="465" width="170" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
