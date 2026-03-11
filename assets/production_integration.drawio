@@ -1,0 +1,131 @@
+<mxfile host="app.diagrams.net" modified="2024-01-15T10:00:00.000Z" agent="Claude" version="24.7.17">
+  <diagram id="production-integration" name="Production Integration">
+    <mxGraphModel dx="1200" dy="680" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="Production Integration Flow" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="275" y="20" width="300" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Sensors Box -->
+        <mxCell id="sensors" value="" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="sensors_icon" value="📡" style="text;html=1;align=center;verticalAlign=middle;fontSize=32;" vertex="1" parent="1">
+          <mxGeometry x="100" y="90" width="80" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="sensors_title" value="Sensors" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#1a365d;" vertex="1" parent="1">
+          <mxGeometry x="60" y="130" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="sensors_subtitle" value="IoT / PLC" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#4a5568;" vertex="1" parent="1">
+          <mxGeometry x="60" y="152" width="160" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Sensor outputs -->
+        <mxCell id="sensor_out1" value="temperature" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#90CAF9;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="178" width="85" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="sensor_out2" value="room_temp" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#90CAF9;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="145" y="178" width="85" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- API Endpoint Box -->
+        <mxCell id="api" value="" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="325" y="80" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="api_icon" value="⚡" style="text;html=1;align=center;verticalAlign=middle;fontSize=32;" vertex="1" parent="1">
+          <mxGeometry x="385" y="90" width="80" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="api_title" value="ML Endpoint" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#744210;" vertex="1" parent="1">
+          <mxGeometry x="345" y="130" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="api_subtitle" value="SageMaker API" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#4a5568;" vertex="1" parent="1">
+          <mxGeometry x="345" y="152" width="160" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- API outputs -->
+        <mxCell id="api_out1" value="prediction" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFE082;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="335" y="178" width="85" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="api_out2" value="probability" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFE082;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="430" y="178" width="85" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Action Box -->
+        <mxCell id="action" value="" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="610" y="80" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="action_icon" value="🔔" style="text;html=1;align=center;verticalAlign=middle;fontSize=32;" vertex="1" parent="1">
+          <mxGeometry x="670" y="90" width="80" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="action_title" value="Actions" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#276749;" vertex="1" parent="1">
+          <mxGeometry x="630" y="130" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="action_subtitle" value="Automated Response" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#4a5568;" vertex="1" parent="1">
+          <mxGeometry x="630" y="152" width="160" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Action outputs -->
+        <mxCell id="action_out1" value="dashboard" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#A5D6A7;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="618" y="178" width="58" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="action_out2" value="notification" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#A5D6A7;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="681" y="178" width="58" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="action_out3" value="work order" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#A5D6A7;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="744" y="178" width="58" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Connector: Sensors to API -->
+        <mxCell id="conn1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#6c8ebf;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="sensors" target="api">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="conn1_label" value="JSON request" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="255" y="125" width="80" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Connector: API to Action -->
+        <mxCell id="conn2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#82b366;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="api" target="action">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="conn2_label" value="if P &gt; threshold" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="540" y="125" width="80" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Probability thresholds legend -->
+        <mxCell id="legend_box" value="" style="rounded=1;arcSize=5;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="260" width="770" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_title" value="Response Thresholds" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#333333;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="265" width="200" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- Threshold items -->
+        <mxCell id="thresh1_box" value="" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="295" width="220" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="thresh1" value="0.5 - 0.7  →  Log warning, monitor" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="60" y="295" width="220" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="thresh2_box" value="" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#ffe0b2;strokeColor=#fb8c00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="310" y="295" width="220" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="thresh2" value="0.7 - 0.9  →  Alert, schedule check" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="310" y="295" width="220" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="thresh3_box" value="" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="560" y="295" width="220" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="thresh3" value="0.9+  →  Immediate attention" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="560" y="295" width="220" height="40" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

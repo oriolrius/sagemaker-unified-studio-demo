@@ -101,16 +101,7 @@ Why `temp_diff` matters: A machine at 75°C in a 20°C room (diff = 55°C) is ge
 
 Once deployed, the model integrates into monitoring systems:
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Sensors   │────▶│  API Call   │────▶│   Action    │
-│  (IoT/PLC)  │     │  (Endpoint) │     │  (Alert)    │
-└─────────────┘     └─────────────┘     └─────────────┘
-     │                    │                    │
-  temperature         prediction            dashboard
-  room_temp           probability           notification
-                                            work order
-```
+![Production Integration](assets/production_integration.png)
 
 **Example API call**:
 
@@ -121,11 +112,6 @@ response = endpoint.predict({
 })
 # Returns: {'prediction': 1, 'probability': 0.97}
 ```
-
-The probability output enables **graduated responses**:
-- 0.5-0.7: Log warning, increase monitoring frequency
-- 0.7-0.9: Alert operator, schedule inspection
-- 0.9+: Immediate attention required
 
 ## Business Value
 
