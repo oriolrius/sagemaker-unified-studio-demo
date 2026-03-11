@@ -1,0 +1,130 @@
+<mxfile host="app.diagrams.net" modified="2026-03-11" agent="Claude">
+  <diagram id="oltp-olap" name="OLTP to OLAP Pipeline">
+    <mxGraphModel dx="900" dy="550" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="OLTP → OLAP Data Pipeline" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="300" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- OLTP Box -->
+        <mxCell id="oltp-box" value="" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="oltp-title" value="OLTP" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="100" y="90" width="80" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="oltp-sub" value="(PostgreSQL)" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#388E3C;" vertex="1" parent="1">
+          <mxGeometry x="90" y="112" width="100" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="oltp-detail1" value="Row storage" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="70" y="145" width="140" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="oltp-detail2" value="Normalized" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="70" y="162" width="140" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="oltp-detail3" value="ACID transactions" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="70" y="179" width="140" height="15" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow 1 -->
+        <mxCell id="arrow1" value="" style="shape=flexArrow;endArrow=classic;html=1;fillColor=#FF9800;strokeColor=#E65100;width=15;endSize=6;rounded=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="150" as="sourcePoint"/>
+            <mxPoint x="320" y="150" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ETL Box -->
+        <mxCell id="etl-box" value="" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#F57C00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="330" y="80" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="etl-title" value="ETL / ELT" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="380" y="90" width="100" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="etl-sub" value="(Glue / EMR)" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#F57C00;" vertex="1" parent="1">
+          <mxGeometry x="380" y="112" width="100" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="etl-detail1" value="CSV → Parquet" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="145" width="140" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="etl-detail2" value="Transform" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="360" y="162" width="140" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="etl-detail3" value="Data quality" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="360" y="179" width="140" height="15" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow 2 -->
+        <mxCell id="arrow2" value="" style="shape=flexArrow;endArrow=classic;html=1;fillColor=#FF9800;strokeColor=#E65100;width=15;endSize=6;rounded=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="540" y="150" as="sourcePoint"/>
+            <mxPoint x="610" y="150" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- OLAP Box -->
+        <mxCell id="olap-box" value="" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="620" y="80" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="olap-title" value="OLAP" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="680" y="90" width="80" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="olap-sub" value="(Athena / Redshift)" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="660" y="112" width="120" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="olap-detail1" value="Columnar storage" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="650" y="145" width="140" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="olap-detail2" value="Denormalized" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="650" y="162" width="140" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="olap-detail3" value="Fast aggregations" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="650" y="179" width="140" height="15" as="geometry"/>
+        </mxCell>
+
+        <!-- Bottom labels -->
+        <mxCell id="oltp-bottom" value="Fast writes&#xa;Current state" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontColor=#2E7D32;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="250" width="140" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="etl-bottom" value="Data transformation&#xa;Format conversion" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#F57C00;fontColor=#E65100;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="250" width="140" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="olap-bottom" value="Fast analytics&#xa;Historical trends" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontColor=#1565C0;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="250" width="140" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Connector arrows from boxes to bottom labels -->
+        <mxCell id="conn1" value="" style="endArrow=classic;html=1;strokeColor=#388E3C;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="220" as="sourcePoint"/>
+            <mxPoint x="140" y="250" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn2" value="" style="endArrow=classic;html=1;strokeColor=#F57C00;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="430" y="220" as="sourcePoint"/>
+            <mxPoint x="430" y="250" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn3" value="" style="endArrow=classic;html=1;strokeColor=#1976D2;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="220" as="sourcePoint"/>
+            <mxPoint x="720" y="250" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Best practice note -->
+        <mxCell id="note" value="Best practice: Export from OLTP as CSV (simple), convert to Parquet in ETL layer, query Parquet in OLAP" style="rounded=1;arcSize=5;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#9E9E9E;fontColor=#424242;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="140" y="320" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

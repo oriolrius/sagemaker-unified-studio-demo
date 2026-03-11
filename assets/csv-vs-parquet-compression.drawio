@@ -1,0 +1,80 @@
+<mxfile host="app.diagrams.net" modified="2026-03-11" agent="Claude">
+  <diagram id="compression-compare" name="CSV vs Parquet Compression">
+    <mxGraphModel dx="900" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="450" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- CSV Section -->
+        <mxCell id="csv-title" value="CSV (Row-based compression)" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#D32F2F;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="280" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- CSV Row Container -->
+        <mxCell id="csv-box" value="" style="rounded=1;arcSize=5;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#D32F2F;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="760" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="csv-content" value="1,Alice,Eng,95000,2023 │ 2,Bob,Mkt,75000,2022 │ 3,Carol,Eng,105000,2021 │ ..." style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#D32F2F;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="50" y="70" width="740" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="csv-label" value="← mixed types: int, str, str, int, date, int, str, str, int, date..." style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="115" width="400" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="csv-result" value="Compression finds few patterns → 2-4x ratio" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#D32F2F;fontColor=#B71C1C;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="112" width="270" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- Parquet Section -->
+        <mxCell id="parquet-title" value="Parquet (Column-based compression)" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="300" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- Parquet Columns -->
+        <mxCell id="col1" value="1,2,3...&#xa;(ints)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;strokeWidth=2;fontColor=#1565C0;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="195" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="col2" value="Alice,Bob...&#xa;(strings)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;strokeWidth=2;fontColor=#2E7D32;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="195" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="col3" value="Eng,Mkt,Eng&#xa;(dict+RLE)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#F57C00;strokeWidth=2;fontColor=#E65100;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="370" y="195" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="col4" value="95k,75k...&#xa;(deltas)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;strokeWidth=2;fontColor=#AD1457;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="195" width="130" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="col5" value="2023,2022...&#xa;(deltas)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#7B1FA2;strokeWidth=2;fontColor=#6A1B9A;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="690" y="195" width="120" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="parquet-label" value="Each column compresses independently with type-specific encoding" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="265" width="400" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="parquet-result" value="Same-type clustering → 10-20x ratio" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontColor=#0D47A1;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="262" width="270" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- Comparison Arrow -->
+        <mxCell id="arrow" value="" style="shape=flexArrow;endArrow=classic;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;width=20;endSize=8;rounded=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="420" y="320" as="sourcePoint"/>
+            <mxPoint x="420" y="360" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Bottom comparison -->
+        <mxCell id="compare-box" value="" style="rounded=1;arcSize=5;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#9E9E9E;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="365" width="600" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="compare-text" value="Parquet achieves 5-10x better compression than CSV&#xa;by grouping same-type data together before applying compression algorithms" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#424242;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="370" width="580" height="45" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
