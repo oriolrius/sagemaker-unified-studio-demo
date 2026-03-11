@@ -21,10 +21,12 @@ df = pd.read_csv(f's3://{bucket}/data/raw/machines.csv')
 ```
 
 This works, but in enterprise environments, data is typically:
+
 - **Cataloged** in a Data Catalog for discoverability and governance
 - **Queried** using SQL for standardization and access control
 
 Your task is to:
+
 1. Register `machines.csv` in the DataZone Data Catalog
 2. Identify which notebooks should query the catalog instead of reading S3 directly
 3. Modify those notebooks to use SQL queries via `awswrangler`
@@ -98,11 +100,13 @@ print(df)
 Review all 13 notebooks and determine which ones should use SQL queries instead of direct S3 reads.
 
 **Your task**: Analyze each notebook and answer:
+
 1. Does this notebook read `machines.csv` from S3?
 2. Would it benefit from SQL-based access (filtering, aggregation)?
 3. Should it be modified to use the Data Catalog?
 
 **Hints**:
+
 - Not all notebooks read from S3
 - Some notebooks read parquet files (leave those unchanged)
 - Some notebooks read from local `models/` folder (leave those unchanged)
@@ -183,6 +187,7 @@ df = wr.athena.read_sql_query(
 ## Part 4: Verify Everything Works
 
 After modifications:
+
 1. Run each modified notebook end-to-end
 2. Verify the output matches the original behavior
 3. Confirm downstream notebooks still work (they depend on the outputs)
@@ -203,17 +208,18 @@ Submit a **single PDF document** named `homework_datacatalog_YOURNAME.pdf` with 
 
 Create a table analyzing ALL 13 notebooks:
 
-| Notebook | Reads CSV from S3? | Should Modify? | Reason |
-|----------|-------------------|----------------|--------|
-| 01_setup_env.ipynb | ? | ? | ? |
-| 02_create_s3_bucket.ipynb | ? | ? | ? |
-| ... | ... | ... | ... |
+| Notebook                  | Reads CSV from S3? | Should Modify? | Reason |
+| ------------------------- | ------------------ | -------------- | ------ |
+| 01_setup_env.ipynb        | ?                  | ?              | ?      |
+| 02_create_s3_bucket.ipynb | ?                  | ?              | ?      |
+| ...                       | ...                | ...            | ...    |
 
 Explain your reasoning for each decision.
 
 ### Chapter 3: Modified Notebooks (3-4 pages)
 
 For each notebook you modified:
+
 - Screenshot of the **original code** (S3 read)
 - Screenshot of the **new code** (SQL query)
 - The **SQL query** you used
@@ -222,11 +228,13 @@ For each notebook you modified:
 ### Chapter 4: SQL Queries (2 pages)
 
 Show at least **3 different SQL queries** you wrote:
+
 - One simple SELECT
 - One with WHERE filtering
 - One with GROUP BY aggregation
 
 For each query:
+
 - The SQL code
 - Screenshot of the result
 - Explanation of what it does
@@ -239,6 +247,7 @@ For each query:
 ### Chapter 6: Reflection (1 page)
 
 Answer these questions:
+
 1. What are the benefits of using a Data Catalog vs. direct S3 access?
 2. In what scenarios would SQL queries be more useful than pandas operations?
 3. What challenges did you encounter and how did you solve them?
@@ -247,26 +256,16 @@ Answer these questions:
 
 ## Grading Rubric
 
-| Chapter | Points | Criteria |
-|---------|--------|----------|
-| **1. Data Catalog Setup** | 15 | Catalog entry created correctly, test query works |
-| **2. Notebook Analysis** | 20 | All 13 notebooks analyzed, correct identification of which to modify, clear reasoning |
-| **3. Modified Notebooks** | 25 | Correct modifications, SQL queries work, clear before/after comparison |
-| **4. SQL Queries** | 15 | At least 3 queries shown (SELECT, WHERE, GROUP BY), correct syntax, meaningful use |
-| **5. Verification** | 10 | Modified notebooks run successfully, downstream dependencies work |
-| **6. Reflection** | 15 | Thoughtful answers demonstrating understanding of Data Catalog benefits and SQL in ML |
+| Chapter                         | Points | Criteria                                                                              |
+| ------------------------------- | ------ | ------------------------------------------------------------------------------------- |
+| **1. Data Catalog Setup** | 15     | Catalog entry created correctly, test query works                                     |
+| **2. Notebook Analysis**  | 20     | All 13 notebooks analyzed, correct identification of which to modify, clear reasoning |
+| **3. Modified Notebooks** | 25     | Correct modifications, SQL queries work, clear before/after comparison                |
+| **4. SQL Queries**        | 15     | At least 3 queries shown (SELECT, WHERE, GROUP BY), correct syntax, meaningful use    |
+| **5. Verification**       | 10     | Modified notebooks run successfully, downstream dependencies work                     |
+| **6. Reflection**         | 15     | Thoughtful answers demonstrating understanding of Data Catalog benefits and SQL in ML |
 
 **Total: 100 points**
-
-### Grade Scale
-
-| Points | Grade |
-|--------|-------|
-| 90-100 | A |
-| 80-89 | B |
-| 70-79 | C |
-| 60-69 | D |
-| <60 | F |
 
 ---
 
@@ -293,6 +292,7 @@ print(tables)
 ### "Access Denied" error
 
 Your execution role needs permissions for:
+
 - Athena query execution
 - Glue Data Catalog access
 - S3 read access to the data location
@@ -315,20 +315,6 @@ Install it in the notebook:
 ```python
 !pip install awswrangler
 ```
-
----
-
-## Summary
-
-| Part | Action | Time |
-|------|--------|------|
-| 1 | Create Data Catalog entry | 30 min |
-| 2 | Analyze all notebooks | 30 min |
-| 3 | Modify identified notebooks | 45 min |
-| 4 | Verify everything works | 30 min |
-| - | Write PDF report | 45 min |
-
-**Total time: ~3 hours**
 
 ---
 
