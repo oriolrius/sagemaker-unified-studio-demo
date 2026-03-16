@@ -1,0 +1,13 @@
+# Ralph Progress Log
+# Feature: workflow-scripts
+# Started: Not yet started
+#
+# Covers backlog tasks:
+#   - TASK-2: Data processing scripts (US-001 to US-006)
+#   - TASK-3: Training script with MLflow (US-007 to US-009)
+#   - TASK-4: Airflow DAG (US-010 to US-012)
+#
+# Browser tasks NOT included (require manual AWS Console):
+#   - TASK-1: Configure MLflow App
+#   - TASK-5: Validate end-to-end execution
+

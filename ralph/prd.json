@@ -1,0 +1,217 @@
+{
+  "project": "SageMaker Unified Studio Demo",
+  "branchName": "ralph/workflow-scripts",
+  "description": "Refactor Jupyter notebooks into standalone Python scripts and create Airflow DAG for SageMaker Unified Studio Workflow orchestration",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create scripts directory structure",
+      "description": "As a developer, I need a proper directory structure so scripts are organized and importable.",
+      "acceptanceCriteria": [
+        "Create `scripts/` directory at project root",
+        "Create `scripts/__init__.py` (empty file for Python package)",
+        "Create `scripts/utils.py` with placeholder for shared utilities",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement structured JSON logging utility",
+      "description": "As an operator, I want structured JSON logs so I can query them in CloudWatch Logs Insights.",
+      "acceptanceCriteria": [
+        "Create `log_json()` function in `scripts/utils.py`",
+        "Log format: {\"timestamp\": \"ISO8601\", \"level\": \"INFO|ERROR\", \"message\": \"...\", \"extra\": {}}",
+        "Function accepts: level, message, and **kwargs for extra fields",
+        "Include script_name, step, and duration_ms support in extra fields",
+        "Logs written to stdout via print()",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement S3 credential fallback utility",
+      "description": "As a developer, I want scripts to work both in SageMaker (IAM role) and locally (.env file).",
+      "acceptanceCriteria": [
+        "Create `get_bucket_name()` function in `scripts/utils.py`",
+        "First try: os.environ.get('BUCKET_NAME')",
+        "Fallback: Load from .env file using python-dotenv load_dotenv()",
+        "Raise ValueError with clear message if bucket name not found",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Create clean_data.py script",
+      "description": "As a workflow orchestrator, I need a standalone script to clean raw machine data.",
+      "acceptanceCriteria": [
+        "Create `scripts/clean_data.py` with argparse for --input-path and --output-path arguments",
+        "Load CSV from input path using pandas.read_csv()",
+        "Remove rows with missing temperature or room_temp using dropna(subset=[...])",
+        "Convert timestamp column to datetime using pd.to_datetime()",
+        "Sort by timestamp ascending with sort_values().reset_index(drop=True)",
+        "Save to output path as Parquet using to_parquet(index=False)",
+        "Log input rows, removed rows, output rows using log_json from utils",
+        "Return exit code 0 on success, 1 on failure (use sys.exit)",
+        "Script has if __name__ == '__main__': main() entry point",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Create feature_engineering.py script",
+      "description": "As a workflow orchestrator, I need a standalone script to create ML features from cleaned data.",
+      "acceptanceCriteria": [
+        "Create `scripts/feature_engineering.py` with argparse for --input-path and --output-path arguments",
+        "Load Parquet from input path using pandas.read_parquet()",
+        "Create temp_diff column: df['temp_diff'] = df['temperature'] - df['room_temp']",
+        "Create overheat column: df['overheat'] = (df['temperature'] > 80).astype(int)",
+        "Select only columns: temperature, temp_diff, overheat",
+        "Save to output path as Parquet using to_parquet(index=False)",
+        "Log input rows, mean temp_diff, overheat percentage using log_json from utils",
+        "Return exit code 0 on success, 1 on failure (use sys.exit)",
+        "Script has if __name__ == '__main__': main() entry point",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Add error handling to data scripts",
+      "description": "As an operator, I need clear error messages when scripts fail so I can debug issues.",
+      "acceptanceCriteria": [
+        "In clean_data.py: wrap main logic in try/except block",
+        "In feature_engineering.py: wrap main logic in try/except block",
+        "On exception: log structured error with level=ERROR, error_type, and message",
+        "On exception: log full traceback using traceback.format_exc()",
+        "On exception: call sys.exit(1)",
+        "Validate required columns exist before processing (temperature, room_temp, timestamp)",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Create requirements.txt for scripts",
+      "description": "As a developer, I need dependencies documented for the Processing Job container.",
+      "acceptanceCriteria": [
+        "Create `scripts/requirements.txt` file",
+        "Include: pandas>=2.0.0",
+        "Include: pyarrow>=12.0.0",
+        "Include: boto3>=1.28.0",
+        "Include: python-dotenv>=1.0.0",
+        "Include: s3fs>=2023.6.0",
+        "Include: scikit-learn>=1.3.0",
+        "Include: mlflow>=2.8.0"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Create train_model.py script with MLflow integration",
+      "description": "As a workflow orchestrator, I need a standalone script to train the ML model with MLflow experiment tracking.",
+      "acceptanceCriteria": [
+        "Create `scripts/train_model.py` with argparse arguments: --input-path, --model-output, --experiment-name (default='machine-overheat'), --test-size (default=0.2)",
+        "Do NOT call mlflow.set_tracking_uri() - it is auto-injected in SageMaker Unified Studio",
+        "Call mlflow.set_experiment(args.experiment_name) to set experiment",
+        "Load features from input-path using pandas.read_parquet()",
+        "Split data: X = df[['temperature', 'temp_diff']], y = df['overheat']",
+        "Use train_test_split with test_size and stratify=y and random_state=42",
+        "Train LogisticRegression(random_state=42, max_iter=1000)",
+        "Inside mlflow.start_run(): log params (model_type, test_size, random_state)",
+        "Calculate and log metrics: accuracy, precision, recall, f1_score",
+        "Log model using mlflow.sklearn.log_model(model, 'model')",
+        "Save model to model-output path using joblib.dump()",
+        "Log input rows, accuracy, and training duration using log_json from utils",
+        "Return exit code 0 on success, 1 on failure",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Add error handling to train_model.py",
+      "description": "As an operator, I need clear error messages when training fails.",
+      "acceptanceCriteria": [
+        "Wrap main training logic in try/except block",
+        "On exception: log structured error with level=ERROR, error_type, and message",
+        "On exception: log full traceback using traceback.format_exc()",
+        "On exception: call sys.exit(1)",
+        "Validate input file exists and has required columns (temperature, temp_diff, overheat)",
+        "Validate accuracy >= 0.85, log warning if below threshold",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Create workflows directory structure",
+      "description": "As a developer, I need a directory for Airflow DAG files.",
+      "acceptanceCriteria": [
+        "Create `workflows/` directory at project root",
+        "Create `workflows/__init__.py` (empty file)",
+        "Typecheck passes"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Create Airflow DAG for ML pipeline",
+      "description": "As a workflow orchestrator, I need an Airflow DAG to orchestrate the ML pipeline steps.",
+      "acceptanceCriteria": [
+        "Create `workflows/machine_overheat_dag.py`",
+        "Import: DAG, PythonOperator from airflow, datetime, timedelta, subprocess",
+        "Define default_args dict with owner='ml-team', retries=1, retry_delay=timedelta(minutes=5)",
+        "Create DAG with dag_id='machine_overheat_pipeline', schedule_interval=None, start_date=datetime(2026,1,1), catchup=False, tags=['ml','overheat']",
+        "Create helper function run_script(script_name, args) that uses subprocess.run() to execute scripts",
+        "Create task clean_data using PythonOperator calling run_script('clean_data.py', input/output args)",
+        "Create task feature_engineering using PythonOperator calling run_script('feature_engineering.py', input/output args)",
+        "Create task train_model using PythonOperator calling run_script('train_model.py', input/output args)",
+        "Set dependencies: clean_data >> feature_engineering >> train_model",
+        "Add docstring explaining the DAG purpose and steps",
+        "Typecheck passes"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Add DAG configuration variables",
+      "description": "As a workflow operator, I need configurable S3 paths in the DAG.",
+      "acceptanceCriteria": [
+        "In machine_overheat_dag.py: define S3_BUCKET variable at top (use Airflow Variable or env var)",
+        "Define S3 paths as variables: RAW_DATA_PATH, CLEAN_DATA_PATH, FEATURES_PATH, MODEL_PATH",
+        "Pass these paths to each task's script arguments",
+        "Add comments explaining how to configure bucket name in Airflow Variables",
+        "Typecheck passes"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
