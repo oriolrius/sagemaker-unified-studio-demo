@@ -1,9 +1,10 @@
 ---
 id: TASK-3
 title: Refactor training notebook 09 into MLflow-integrated script
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-03-16 18:48'
+updated_date: '2026-03-16 20:38'
 labels:
   - refactor
   - mlflow

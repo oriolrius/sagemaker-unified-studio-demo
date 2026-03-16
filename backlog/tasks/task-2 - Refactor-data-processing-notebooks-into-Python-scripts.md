@@ -1,9 +1,10 @@
 ---
 id: TASK-2
 title: Refactor data processing notebooks into Python scripts
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-03-16 18:48'
+updated_date: '2026-03-16 20:38'
 labels:
   - refactor
   - scripts
