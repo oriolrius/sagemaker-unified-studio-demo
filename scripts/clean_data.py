@@ -62,13 +62,17 @@ def main() -> int:
     args = parse_args()
 
     try:
-        # Resolve S3 paths
-        bucket_name = get_bucket_name()
-        input_path = args.input_path or f"s3://{bucket_name}/data/raw/machines.csv"
-        output_path = (
-            args.output_path
-            or f"s3://{bucket_name}/data/processed/clean_machines.parquet"
-        )
+        # Resolve paths - only fetch bucket name if paths not explicitly provided
+        if args.input_path and args.output_path:
+            input_path = args.input_path
+            output_path = args.output_path
+        else:
+            bucket_name = get_bucket_name()
+            input_path = args.input_path or f"s3://{bucket_name}/data/raw/machines.csv"
+            output_path = (
+                args.output_path
+                or f"s3://{bucket_name}/data/processed/clean_machines.parquet"
+            )
 
         log_json(
             "INFO",

@@ -97,12 +97,16 @@ def main() -> int:
     args = parse_args()
 
     try:
-        # Resolve S3 paths
-        bucket_name = get_bucket_name()
-        input_path = (
-            args.input_path or f"s3://{bucket_name}/data/features/features.parquet"
-        )
-        model_output = args.model_output or f"s3://{bucket_name}/models/model.joblib"
+        # Resolve paths - only fetch bucket name if paths not explicitly provided
+        if args.input_path and args.model_output:
+            input_path = args.input_path
+            model_output = args.model_output
+        else:
+            bucket_name = get_bucket_name()
+            input_path = (
+                args.input_path or f"s3://{bucket_name}/data/features/features.parquet"
+            )
+            model_output = args.model_output or f"s3://{bucket_name}/models/model.joblib"
 
         log_json(
             "INFO",
@@ -231,24 +235,27 @@ def main() -> int:
             )
             mlflow.sklearn.log_model(model, "model")
 
-        # Save model to S3
+        # Save model
         log_json(
             "INFO",
-            "Saving model to S3",
+            "Saving model",
             script_name=SCRIPT_NAME,
             step="save",
             model_output=model_output,
         )
 
-        # For S3, save locally first then upload (joblib doesn't support S3 directly)
-        local_model_path = "/tmp/model.joblib"
-        joblib.dump(model, local_model_path)
-
-        # Upload to S3 using pandas/s3fs infrastructure
-        import s3fs
-
-        fs = s3fs.S3FileSystem()
-        fs.put(local_model_path, model_output)
+        if model_output.startswith("s3://"):
+            # For S3, save locally first then upload
+            import s3fs
+            local_model_path = "/tmp/model.joblib"
+            joblib.dump(model, local_model_path)
+            fs = s3fs.S3FileSystem()
+            fs.put(local_model_path, model_output)
+        else:
+            # Local file path
+            import os
+            os.makedirs(os.path.dirname(model_output), exist_ok=True)
+            joblib.dump(model, model_output)
 
         duration_ms = (time.time() - start_time) * 1000
         log_json(
