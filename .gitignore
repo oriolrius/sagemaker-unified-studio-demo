@@ -57,3 +57,9 @@ data/*.csv
 *.joblib
 model/
 aws_credentials.yaml
+
+# Playwright MCP logs and screenshots
+.playwright-mcp/
+
+# Screenshots (browser automation artifacts)
+*.png
