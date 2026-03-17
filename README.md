@@ -30,13 +30,17 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 
 > **Important:** You cannot create an MLflow App from Unified Studio. It must be created in **SageMaker AI Studio** (the classic Studio IDE) first, then connected to your Unified Studio project.
 
-1. Open **SageMaker AI Studio** (from the AWS Console: SageMaker > Domains > your domain > Open Studio)
-2. Click **MLflow** in the left sidebar
-3. Click **"Create MLflow App"**
+1. Open the **AWS Console** and navigate to **Amazon SageMaker AI > Domains**. You'll see your domains listed with their status.
+
+![SageMaker AI Domains page in AWS Console](assets/aws-console-sagemaker-domains.png)
+
+2. Click **"Open Studio"** next to your domain (e.g., `QuickSetupDomain-...`) to launch SageMaker AI Studio.
+3. In Studio, click **MLflow** in the left sidebar.
+4. Click **"Create MLflow App"**.
 
 ![SageMaker Studio MLflow page](assets/sagemaker-studio-mlflow-create.png)
 
-4. Fill in the creation form:
+5. Fill in the creation form:
    - **Name**: e.g., `machine-overheat-mlflow` (letters, numbers, dashes only)
    - **Advanced settings** (expand to configure):
      - **IAM role**: Select your SageMaker execution role (pre-populated with domain default)
@@ -44,8 +48,8 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 
 ![Create MLflow App dialog with advanced settings](assets/sagemaker-studio-mlflow-create-advanced.png)
 
-5. Click **Create** and wait ~5 minutes for the app to reach "Created" status
-6. Copy the **MLflow App ARN** (format: `arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/APP_ID`)
+6. Click **Create** and wait ~5 minutes for the app to reach "Created" status
+7. Copy the **MLflow App ARN** (format: `arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/APP_ID`)
 
 ### Step 2. Connect MLflow to your Unified Studio project
 
@@ -68,21 +72,25 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 
 ### Step 3. Upload notebooks
 
-Go to **Files** in the left sidebar and upload:
+Go to **Files** in the left sidebar and upload the three pipeline notebooks:
 
 - `06_clean_data.ipynb` — data cleaning
 - `07_feature_engineering.ipynb` — feature creation
 - `09_mlflow_tracking.ipynb` — model training with MLflow tracking
 
+Once uploaded, the Files page should show the notebooks in the **Shared** folder:
+
+![Unified Studio Files page with uploaded notebooks](assets/unified-studio-files-page.png)
+
 ### Step 4. Create the workflow
 
-Go to **Workflows** in the left sidebar, click **Create workflow**, and define three tasks in sequence:
+Go to **Workflows** in the left sidebar, click **Create workflow**, and define three tasks in sequence. The visual editor shows the DAG with each task as a `SageMakerNotebookOperator` node:
 
-```
-clean_data → feature_engineering → train_model
-```
+![Workflow visual editor showing 3-task pipeline](assets/unified-studio-workflow-visual-editor.png)
 
-Switch to **Code view** and set the YAML. Replace the `mlflow_tracking_uri` value with your own MLflow App ARN:
+Click the **code icon** (`<>`) in the toolbar (top-right, next to the settings gear) to switch to **Code view**. Replace the YAML content with the configuration below — update the `mlflow_tracking_uri` value with your own MLflow App ARN:
+
+![Workflow code view showing YAML editor](assets/unified-studio-workflow-code-view.png)
 
 ```yaml
 machine_overheat_pipeline:
@@ -132,9 +140,22 @@ Click **Apply**, then **Save**.
 
 ### Step 5. Run and verify
 
-1. Click **Run** on the workflow page
-2. Monitor progress in the **Runs** tab (~12 min total)
-3. Go to **MLflow > Open MLflow** to see the logged experiment with metrics, parameters, and model artifact
+1. Click the green **"Run"** button (top-right of the visual editor, visible in the screenshot above).
+2. Click the **clock icon** in the toolbar (or navigate to the Runs panel) to monitor progress. The **Runs** tab shows all executions with status, duration, and timestamps (~12 min total for the full pipeline):
+
+![Workflow Runs tab showing execution history](assets/unified-studio-workflow-runs.png)
+
+3. Click on a successful **Run ID** to see per-task details. Each of the 3 tasks runs as a `SageMakerNotebookOperator` with ~3 min duration:
+
+![Workflow run details showing 3 successful tasks](assets/unified-studio-workflow-run-details.png)
+
+4. Go to **MLflow** in the left sidebar and click **"Open MLflow"** on the connected tracking server. The MLflow UI shows the `machine-overheat` experiment:
+
+![MLflow experiments list](assets/mlflow-experiment-runs.png)
+
+5. Click on the experiment, then on the run (e.g., `logistic_regression_v1`) to see metrics (accuracy, precision, recall, f1), parameters, and the registered model artifact:
+
+![MLflow run details with metrics, parameters, and model](assets/mlflow-run-details.png)
 
 ## MLflow Integration: How It Works
 
