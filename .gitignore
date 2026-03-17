@@ -61,5 +61,5 @@ aws_credentials.yaml
 # Playwright MCP logs and screenshots
 .playwright-mcp/
 
-# Screenshots (browser automation artifacts)
-*.png
+# Screenshots (browser automation artifacts in root, not assets/)
+/*.png

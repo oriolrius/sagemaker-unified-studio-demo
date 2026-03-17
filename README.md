@@ -26,11 +26,45 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 
 ## Quick Start
 
-### 1. Set up the Unified Studio project
+### 1. Create the MLflow App (in SageMaker AI Studio)
 
-- Create or open a project in [SageMaker Unified Studio](https://dzd-4672wthgfxutp2.sagemaker.eu-west-1.on.aws)
-- Create an MLflow App (AI/ML > MLflow > Create app) — takes ~5 min
-- Note the MLflow App ARN (format: `arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/APP_ID`)
+> **Important:** You cannot create an MLflow App from Unified Studio. It must be created in **SageMaker AI Studio** (the classic Studio IDE) first, then connected to your Unified Studio project.
+
+1. Open **SageMaker AI Studio** (from the AWS Console: SageMaker > Domains > your domain > Open Studio)
+2. Click **MLflow** in the left sidebar
+3. Click **"Create MLflow App"**
+
+![SageMaker Studio MLflow page](assets/sagemaker-studio-mlflow-create.png)
+
+4. Fill in the creation form:
+   - **Name**: e.g., `machine-overheat-mlflow` (letters, numbers, dashes only)
+   - **Advanced settings** (expand to configure):
+     - **IAM role**: Select your SageMaker execution role (pre-populated with domain default)
+     - **Artifact storage location (S3 URI)**: e.g., `s3://sagemaker-eu-west-1-658203403846`
+
+![Create MLflow App dialog with advanced settings](assets/sagemaker-studio-mlflow-create-advanced.png)
+
+5. Click **Create** and wait ~5 minutes for the app to reach "Created" status
+6. Copy the **MLflow App ARN** (format: `arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/APP_ID`)
+
+### 2. Connect MLflow to your Unified Studio project
+
+1. Open your project in [SageMaker Unified Studio](https://dzd-4672wthgfxutp2.sagemaker.eu-west-1.on.aws)
+2. Go to **MLflow** in the left sidebar (under AI/ML)
+
+![Unified Studio MLflow page](assets/unified-studio-mlflow-page.png)
+
+3. Click **"Connect Tracking Server"** (green button, top-right)
+4. Fill in:
+   - **Connection name**: e.g., `machine-overheat-mlflow`
+   - **MLflow Tracking Server ARN**: paste the ARN from step 1
+
+![Connect Tracking Server panel](assets/unified-studio-connect-tracking-server-panel.png)
+
+5. Click **"Connect to server"**
+6. The server appears in the table with status "On". Click **"Open MLflow"** to verify.
+
+![Connected MLflow server details](assets/unified-studio-mlflow-connection-details.png)
 
 ### 2. Upload notebooks
 
