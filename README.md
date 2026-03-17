@@ -178,7 +178,7 @@ machine_overheat_pipeline:
         airflow.providers.amazon.aws.operators.sagemaker_unified_studio.SageMakerNotebookOperator
       input_config:
         input_params:
-          bucket_name: "YOUR_BUCKET_NAME"
+          mlflow_tracking_uri: "arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/YOUR_APP_ID"
           endpoint_name: "machine-overheat-endpoint"
         input_path: 12_deploy_endpoint.ipynb
       compute: {}
@@ -272,9 +272,9 @@ failed with error code 404 != 200. Response body: 'Tracking server could not be 
 |---|---|---|---|
 | `06_clean_data.ipynb` | Remove nulls, convert types | `s3://bucket/data/raw/machines.csv` | `s3://bucket/data/processed/clean_machines.parquet` |
 | `07_feature_engineering.ipynb` | Create `temp_diff`, `overheat` label | `s3://bucket/data/processed/clean_machines.parquet` | `s3://bucket/data/features/features.parquet` |
-| `09_mlflow_tracking.ipynb` | Train, log to MLflow, register model | `s3://bucket/data/features/features.parquet` | MLflow run + registered model + `s3://bucket/models/model.tar.gz` |
+| `09_mlflow_tracking.ipynb` | Train, log to MLflow, register model | `s3://bucket/data/features/features.parquet` | MLflow run + registered model |
 | `11_validate_model.ipynb` | Validate accuracy, F1, distribution | MLflow registry + `s3://bucket/data/features/` | Assert gates pass (fails workflow if not) |
-| `12_deploy_endpoint.ipynb` | Deploy SageMaker real-time endpoint | `s3://bucket/models/model.tar.gz` | SageMaker endpoint + smoke test |
+| `12_deploy_endpoint.ipynb` | Deploy SageMaker real-time endpoint | MLflow registry (latest model) | SageMaker endpoint + smoke test |
 
 ### Setup & Exploration Notebooks (run manually in JupyterLab)
 
