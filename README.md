@@ -232,10 +232,6 @@ s3://amazon-sagemaker-{account}-{region}-{project_id}/shared/workflows/output/
 | IAM AccessDeniedException on MLflow | Missing `CreatePresignedMlflowAppUrl` permission | Add `sagemaker:CreatePresignedMlflowAppUrl` to execution role |
 | Workflow visual editor clicks don't work | `node-placer-background` overlay blocks interaction | Run in console: `document.getElementById('node-placer-background').style.display = 'none'` |
 
-## Alternative: Airflow DAG (Code Workflow)
-
-The `workflows/machine_overheat_dag.py` file provides an alternative Python-based DAG that uses `PythonOperator` + subprocess calls to the scripts in `scripts/`. This approach gives more control but requires MWAA (Managed Airflow) direct access, which is not exposed in Unified Studio's visual workflow editor.
-
 ## Unified Studio Components Used
 
 | Component | Usage |
