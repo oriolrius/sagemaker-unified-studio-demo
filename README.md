@@ -1,6 +1,6 @@
 # SageMaker Unified Studio - Machine Overheat ML Pipeline
 
-End-to-end ML pipeline for predicting machine overheating, built and orchestrated entirely within **Amazon SageMaker Unified Studio**. The pipeline runs as a workflow that cleans data, engineers features, trains a model, and logs experiment traces to the Unified Studio MLflow App.
+End-to-end ML pipeline for predicting machine overheating, built and orchestrated entirely within **Amazon SageMaker Unified Studio**. The pipeline runs as a workflow that cleans data, engineers features, trains a model, registers it in the MLflow Model Registry, validates quality gates, and deploys a real-time inference endpoint.
 
 ## Architecture
 
@@ -10,11 +10,16 @@ SageMaker Unified Studio
 │   └── machine_overheat_pipeline
 │       ├── clean_data          → 06_clean_data.ipynb
 │       ├── feature_engineering → 07_feature_engineering.ipynb
-│       └── train_model         → 09_mlflow_tracking.ipynb  ──→  MLflow App
+│       ├── train_model         → 09_mlflow_tracking.ipynb  ──→  MLflow App
+│       ├── validate_model      → 11_validate_model.ipynb   ──→  MLflow Registry
+│       └── deploy_endpoint     → 12_deploy_endpoint.ipynb  ──→  SageMaker Endpoint
 │
 ├── MLflow App (machine-overheat-mlflow)
 │   └── Experiment: machine-overheat
-│       └── Run: logistic_regression_v1 (metrics, params, model artifact)
+│       └── Run: logistic_regression_v1 (metrics, params, registered model)
+│
+├── SageMaker Endpoint (machine-overheat-endpoint)
+│   └── Real-time inference (ml.t2.medium)
 │
 ├── Files (shared project storage)
 │   └── Notebooks
@@ -22,7 +27,7 @@ SageMaker Unified Studio
 └── JupyterLab (interactive development)
 ```
 
-Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i.xlarge` instance, runs the notebook via papermill, and terminates. Total pipeline time: ~12 minutes (3 tasks x ~3 min provisioning + execution).
+Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i.xlarge` instance, runs the notebook via papermill, and terminates. Total pipeline time: ~20 minutes (5 tasks x ~3 min provisioning + execution, plus ~5 min endpoint deployment).
 
 ## Quick Start
 
@@ -86,11 +91,14 @@ Before starting, ensure you have:
 
 ### Step 3. Upload notebooks
 
-Go to **Files** in the left sidebar and upload the three pipeline notebooks:
+Go to **Files** in the left sidebar and upload the pipeline notebooks plus the endpoint test notebook:
 
 - `06_clean_data.ipynb` — data cleaning
 - `07_feature_engineering.ipynb` — feature creation
-- `09_mlflow_tracking.ipynb` — model training with MLflow tracking
+- `09_mlflow_tracking.ipynb` — model training, MLflow logging & registration
+- `11_validate_model.ipynb` — model validation (accuracy, F1, distribution gates)
+- `12_deploy_endpoint.ipynb` — endpoint deployment with smoke test
+- `13_test_endpoint.ipynb` — manual endpoint testing (run in JupyterLab after workflow completes)
 
 Once uploaded, the Files page should show the notebooks in the **Shared** folder:
 
@@ -149,9 +157,37 @@ machine_overheat_pipeline:
       output_config:
         output_formats:
           - NOTEBOOK
+    validate_model:
+      dependencies:
+        - train_model
+      operator: >-
+        airflow.providers.amazon.aws.operators.sagemaker_unified_studio.SageMakerNotebookOperator
+      input_config:
+        input_params:
+          mlflow_tracking_uri: "arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/YOUR_APP_ID"
+          bucket_name: "YOUR_BUCKET_NAME"
+        input_path: 11_validate_model.ipynb
+      compute: {}
+      output_config:
+        output_formats:
+          - NOTEBOOK
+    deploy_endpoint:
+      dependencies:
+        - validate_model
+      operator: >-
+        airflow.providers.amazon.aws.operators.sagemaker_unified_studio.SageMakerNotebookOperator
+      input_config:
+        input_params:
+          bucket_name: "YOUR_BUCKET_NAME"
+          endpoint_name: "machine-overheat-endpoint"
+        input_path: 12_deploy_endpoint.ipynb
+      compute: {}
+      output_config:
+        output_formats:
+          - NOTEBOOK
   description: >-
     ML pipeline for machine overheat prediction: clean_data ->
-    feature_engineering -> train_model with MLflow tracking
+    feature_engineering -> train_model -> validate_model -> deploy_endpoint
 ```
 
 Click **Apply**, then **Save**.
@@ -236,7 +272,9 @@ failed with error code 404 != 200. Response body: 'Tracking server could not be 
 |---|---|---|---|
 | `06_clean_data.ipynb` | Remove nulls, convert types | `s3://bucket/data/raw/machines.csv` | `s3://bucket/data/processed/clean_machines.parquet` |
 | `07_feature_engineering.ipynb` | Create `temp_diff`, `overheat` label | `s3://bucket/data/processed/clean_machines.parquet` | `s3://bucket/data/features/features.parquet` |
-| `09_mlflow_tracking.ipynb` | Train LogisticRegression, log to MLflow | `s3://bucket/data/features/features.parquet` | MLflow run + `s3://bucket/models/` |
+| `09_mlflow_tracking.ipynb` | Train, log to MLflow, register model | `s3://bucket/data/features/features.parquet` | MLflow run + registered model + `s3://bucket/models/model.tar.gz` |
+| `11_validate_model.ipynb` | Validate accuracy, F1, distribution | MLflow registry + `s3://bucket/data/features/` | Assert gates pass (fails workflow if not) |
+| `12_deploy_endpoint.ipynb` | Deploy SageMaker real-time endpoint | `s3://bucket/models/model.tar.gz` | SageMaker endpoint + smoke test |
 
 ### Setup & Exploration Notebooks (run manually in JupyterLab)
 
@@ -248,15 +286,13 @@ failed with error code 404 != 200. Response body: 'Tracking server could not be 
 | `04_upload_to_s3.ipynb` | Upload `machines.csv` to S3 |
 | `05_explore_data.ipynb` | Exploratory data analysis |
 | `08_train_model.ipynb` | Basic training (no MLflow) |
-| `10_model_registry.ipynb` | Register model version |
-| `11_validate_model.ipynb` | Accuracy validation (>85% threshold) |
+| `10_model_registry.ipynb` | Register model in SageMaker Model Registry (alternative to MLflow registry) |
 
-### Deployment Notebooks (optional)
+### Testing Notebooks (run manually after workflow completes)
 
 | Notebook | Purpose |
 |---|---|
-| `12_deploy_endpoint.ipynb` | Create SageMaker real-time inference endpoint |
-| `13_test_endpoint.ipynb` | Test endpoint with various scenarios |
+| `13_test_endpoint.ipynb` | Test deployed endpoint with various scenarios (normal, overheat, borderline, batch) |
 
 ## Data Schema
 
@@ -314,9 +350,10 @@ s3://amazon-sagemaker-{account}-{region}-{project_id}/shared/workflows/output/
 | Component | Usage |
 |---|---|
 | JupyterLab | Interactive notebook development |
-| Workflows | Orchestrated ML pipeline (3 tasks) |
-| MLflow | Experiment tracking (metrics, params, model artifacts) |
+| Workflows | Orchestrated ML pipeline (5 tasks) |
+| MLflow | Experiment tracking, model registry |
 | Files | Shared project notebook storage |
+| Inference Endpoint | Real-time predictions (`machine-overheat-endpoint`) |
 
 ## Cleanup
 
