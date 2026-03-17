@@ -26,6 +26,17 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 
 ## Quick Start
 
+### Prerequisites
+
+Before starting, ensure you have:
+
+1. **An AWS account** with permissions to create SageMaker resources
+2. **A SageMaker AI domain** — if you don't have one, go to **Amazon SageMaker AI > Domains** in the AWS Console and click **"Set up for single user (Quick setup)"**. This creates a domain with a default user profile, execution role, and a default JupyterLab space. Wait ~3 minutes for the domain to reach "InService" status.
+3. **A SageMaker Unified Studio project** — this is where you'll upload notebooks, create workflows, and connect MLflow. If you don't have one, open your [Unified Studio portal](https://docs.aws.amazon.com/sagemaker-unified-studio/latest/userguide/what-is-sagemaker-unified-studio.html) and create a new project.
+4. **S3 data bucket with raw data uploaded** — the pipeline notebooks expect data at `s3://{bucket}/data/raw/machines.csv`. Run the setup notebooks (`01` through `04`) in JupyterLab to create the bucket and upload synthetic data before running the workflow.
+
+> **Note:** Quick Setup also auto-creates a `DefaultMLFlowApp`. You can use it or create a dedicated one in Step 1.
+
 ### Step 1. Create the MLflow App (in SageMaker AI Studio)
 
 > **Important:** You cannot create an MLflow App from Unified Studio. It must be created in **SageMaker AI Studio** (the classic Studio IDE) first, then connected to your Unified Studio project.
@@ -59,6 +70,9 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 ![Unified Studio MLflow page](assets/unified-studio-mlflow-page.png)
 
 3. Click **"Connect Tracking Server"** (green button, top-right)
+
+> **Re-deploy note:** If you previously connected an MLflow server that no longer exists (e.g., after cleanup), you must delete the stale connection first — click the **three-dot menu** (Actions) on the old entry and select **"Delete"**. Otherwise the new connection will fail with a 409 Conflict error.
+
 4. Fill in:
    - **Connection name**: e.g., `machine-overheat-mlflow`
    - **MLflow Tracking Server ARN**: paste the ARN from Step 1
@@ -84,7 +98,11 @@ Once uploaded, the Files page should show the notebooks in the **Shared** folder
 
 ### Step 4. Create the workflow
 
-Go to **Workflows** in the left sidebar, click **Create workflow**, and define three tasks in sequence. The visual editor shows the DAG with each task as a `SageMakerNotebookOperator` node:
+Go to **Workflows** in the left sidebar, click **Create workflow**, and define three tasks in sequence.
+
+> **Re-deploy note:** Workflow names persist even after deleting all SageMaker infrastructure. If `machine_overheat_pipeline` already exists from a prior deployment, choose a different name (e.g., `machine_overheat_pipeline_v2`). Remember to update the `dag_id` in the YAML to match.
+
+The visual editor shows the DAG with each task as a `SageMakerNotebookOperator` node:
 
 ![Workflow visual editor showing 3-task pipeline](assets/unified-studio-workflow-visual-editor.png)
 
@@ -125,7 +143,7 @@ machine_overheat_pipeline:
         airflow.providers.amazon.aws.operators.sagemaker_unified_studio.SageMakerNotebookOperator
       input_config:
         input_params:
-          mlflow_tracking_uri: "arn:aws:sagemaker:eu-west-1:658203403846:mlflow-app/app-IN74ELWDTMBI"
+          mlflow_tracking_uri: "arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/YOUR_APP_ID"
         input_path: 09_mlflow_tracking.ipynb
       compute: {}
       output_config:
@@ -170,13 +188,13 @@ The MLflow App ARN is passed as a **papermill parameter** from the workflow YAML
 **Workflow YAML** passes the ARN:
 ```yaml
 input_params:
-  mlflow_tracking_uri: "arn:aws:sagemaker:eu-west-1:658203403846:mlflow-app/app-IN74ELWDTMBI"
+  mlflow_tracking_uri: "arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/YOUR_APP_ID"
 ```
 
 **Notebook** receives it via a cell tagged `parameters` (papermill convention):
 ```python
 # Parameters (injected by workflow via papermill)
-mlflow_tracking_uri = "arn:aws:sagemaker:eu-west-1:658203403846:mlflow-app/app-IN74ELWDTMBI"
+mlflow_tracking_uri = "arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/YOUR_APP_ID"
 ```
 
 Then uses it before any MLflow operation:
@@ -287,6 +305,9 @@ s3://amazon-sagemaker-{account}-{region}-{project_id}/shared/workflows/output/
 | Notebook can't read S3 data | `BUCKET_NAME` env var not set in operator context | Use hardcoded fallback: `os.getenv('BUCKET_NAME', 'your-bucket')` |
 | IAM AccessDeniedException on MLflow | Missing `CreatePresignedMlflowAppUrl` permission | Add `sagemaker:CreatePresignedMlflowAppUrl` to execution role |
 | Can't create MLflow App in Unified Studio | Creation is only available in SageMaker AI Studio | Open SageMaker AI Studio > MLflow > Create MLflow App |
+| 409 Conflict when connecting MLflow | Stale connection from a previous (deleted) MLflow App | Delete the old connection via Actions > Delete, then retry |
+| Files page shows "NoSuchBucket" | The project's backing S3 bucket was deleted | Recreate the bucket: `aws s3 mb s3://amazon-sagemaker-{account}-{region}-{project_id}` |
+| Workflow name already exists | Names persist across re-deployments (tied to DataZone project) | Use a different workflow name or delete the old workflow first |
 
 ## Unified Studio Components Used
 
@@ -299,13 +320,20 @@ s3://amazon-sagemaker-{account}-{region}-{project_id}/shared/workflows/output/
 
 ## Cleanup
 
+> **Warning:** Do **not** delete the project's backing S3 bucket (`s3://amazon-sagemaker-{account}-{region}-{project_id}`) — it is managed by Unified Studio and deleting it breaks the Files section. Only delete the data bucket you created.
+
 ```bash
 # Delete MLflow App
-aws sagemaker delete-mlflow-app --arn "arn:aws:sagemaker:eu-west-1:658203403846:mlflow-app/app-IN74ELWDTMBI"
+aws sagemaker delete-mlflow-app --arn "arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/YOUR_APP_ID"
+
+# Delete SageMaker domain (must delete user profiles first)
+aws sagemaker delete-user-profile --domain-id DOMAIN_ID --user-profile-name USER_PROFILE --region REGION
+aws sagemaker delete-domain --domain-id DOMAIN_ID --region REGION
 
 # Delete endpoint (if deployed)
-aws sagemaker delete-endpoint --endpoint-name machine-overheat-endpoint --region eu-west-1
+aws sagemaker delete-endpoint --endpoint-name machine-overheat-endpoint --region REGION
 
-# Empty and delete S3 bucket
-aws s3 rm s3://$BUCKET --recursive --region eu-west-1
+# Empty and delete data S3 bucket
+aws s3 rm s3://$BUCKET --recursive --region REGION
+aws s3 rb s3://$BUCKET --region REGION
 ```
