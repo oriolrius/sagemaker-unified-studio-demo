@@ -17,7 +17,7 @@ SageMaker Unified Studio
 │       └── Run: logistic_regression_v1 (metrics, params, model artifact)
 │
 ├── Files (shared project storage)
-│   └── Notebooks + scripts
+│   └── Notebooks
 │
 └── JupyterLab (interactive development)
 ```
@@ -26,7 +26,7 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 
 ## Quick Start
 
-### 1. Create the MLflow App (in SageMaker AI Studio)
+### Step 1. Create the MLflow App (in SageMaker AI Studio)
 
 > **Important:** You cannot create an MLflow App from Unified Studio. It must be created in **SageMaker AI Studio** (the classic Studio IDE) first, then connected to your Unified Studio project.
 
@@ -47,9 +47,9 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 5. Click **Create** and wait ~5 minutes for the app to reach "Created" status
 6. Copy the **MLflow App ARN** (format: `arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/APP_ID`)
 
-### 2. Connect MLflow to your Unified Studio project
+### Step 2. Connect MLflow to your Unified Studio project
 
-1. Open your project in [SageMaker Unified Studio](https://dzd-4672wthgfxutp2.sagemaker.eu-west-1.on.aws)
+1. Open your project in SageMaker Unified Studio
 2. Go to **MLflow** in the left sidebar (under AI/ML)
 
 ![Unified Studio MLflow page](assets/unified-studio-mlflow-page.png)
@@ -57,7 +57,7 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 3. Click **"Connect Tracking Server"** (green button, top-right)
 4. Fill in:
    - **Connection name**: e.g., `machine-overheat-mlflow`
-   - **MLflow Tracking Server ARN**: paste the ARN from step 1
+   - **MLflow Tracking Server ARN**: paste the ARN from Step 1
 
 ![Connect Tracking Server panel](assets/unified-studio-connect-tracking-server-panel.png)
 
@@ -66,22 +66,23 @@ Each workflow task uses `SageMakerNotebookOperator`, which provisions an `ml.m6i
 
 ![Connected MLflow server details](assets/unified-studio-mlflow-connection-details.png)
 
-### 2. Upload notebooks
+### Step 3. Upload notebooks
 
-Go to **Files** and upload:
+Go to **Files** in the left sidebar and upload:
+
 - `06_clean_data.ipynb` — data cleaning
 - `07_feature_engineering.ipynb` — feature creation
 - `09_mlflow_tracking.ipynb` — model training with MLflow tracking
 
-### 3. Create the workflow
+### Step 4. Create the workflow
 
-Go to **Workflows > Create workflow** and define three tasks in sequence:
+Go to **Workflows** in the left sidebar, click **Create workflow**, and define three tasks in sequence:
 
 ```
 clean_data → feature_engineering → train_model
 ```
 
-Switch to **Code view** and set the YAML (update the MLflow App ARN to yours):
+Switch to **Code view** and set the YAML. Replace the `mlflow_tracking_uri` value with your own MLflow App ARN:
 
 ```yaml
 machine_overheat_pipeline:
@@ -129,11 +130,11 @@ machine_overheat_pipeline:
 
 Click **Apply**, then **Save**.
 
-### 4. Run and verify
+### Step 5. Run and verify
 
 1. Click **Run** on the workflow page
-2. Monitor in the **Runs** tab (~12 min total)
-3. Go to **MLflow > Open MLflow** to see the logged experiment
+2. Monitor progress in the **Runs** tab (~12 min total)
+3. Go to **MLflow > Open MLflow** to see the logged experiment with metrics, parameters, and model artifact
 
 ## MLflow Integration: How It Works
 
@@ -151,7 +152,7 @@ input_params:
   mlflow_tracking_uri: "arn:aws:sagemaker:eu-west-1:658203403846:mlflow-app/app-IN74ELWDTMBI"
 ```
 
-**Notebook** receives it via a cell tagged `parameters`:
+**Notebook** receives it via a cell tagged `parameters` (papermill convention):
 ```python
 # Parameters (injected by workflow via papermill)
 mlflow_tracking_uri = "arn:aws:sagemaker:eu-west-1:658203403846:mlflow-app/app-IN74ELWDTMBI"
@@ -264,7 +265,7 @@ s3://amazon-sagemaker-{account}-{region}-{project_id}/shared/workflows/output/
 | MLflow 404 "Tracking server could not be found" | `sagemaker-mlflow` plugin 0.1.x doesn't support `mlflow-app` ARN | Add `pip install sagemaker-mlflow>=0.2.0` cell before `import mlflow` |
 | Notebook can't read S3 data | `BUCKET_NAME` env var not set in operator context | Use hardcoded fallback: `os.getenv('BUCKET_NAME', 'your-bucket')` |
 | IAM AccessDeniedException on MLflow | Missing `CreatePresignedMlflowAppUrl` permission | Add `sagemaker:CreatePresignedMlflowAppUrl` to execution role |
-| Workflow visual editor clicks don't work | `node-placer-background` overlay blocks interaction | Run in console: `document.getElementById('node-placer-background').style.display = 'none'` |
+| Can't create MLflow App in Unified Studio | Creation is only available in SageMaker AI Studio | Open SageMaker AI Studio > MLflow > Create MLflow App |
 
 ## Unified Studio Components Used
 
@@ -278,6 +279,9 @@ s3://amazon-sagemaker-{account}-{region}-{project_id}/shared/workflows/output/
 ## Cleanup
 
 ```bash
+# Delete MLflow App
+aws sagemaker delete-mlflow-app --arn "arn:aws:sagemaker:eu-west-1:658203403846:mlflow-app/app-IN74ELWDTMBI"
+
 # Delete endpoint (if deployed)
 aws sagemaker delete-endpoint --endpoint-name machine-overheat-endpoint --region eu-west-1
 
