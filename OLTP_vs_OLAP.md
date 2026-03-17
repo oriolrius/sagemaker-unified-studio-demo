@@ -1,15 +1,15 @@
 # OLTP vs OLAP: Understanding Data Storage Paradigms
 
-  What CSV actually is:
+What CSV actually is:
 
-- An interchange/export format — a simple way to move data between systems
-- Row-oriented text, which makes it easy to export from row-based OLTP databases
+* An interchange/export format — a simple way to move data between systems
+* Row-oriented text, which makes it easy to export from row-based OLTP databases
 
-  What OLTP systems actually use:
+What OLTP systems actually use:
 
-- PostgreSQL: heap files with TOAST, B-tree indexes
-- MySQL InnoDB: clustered indexes, tablespaces
-- Oracle: data blocks, extents, segments
+* PostgreSQL: heap files with TOAST, B-tree indexes
+* MySQL InnoDB: clustered indexes, tablespaces
+* Oracle: data blocks, extents, segments
 
 ## Overview
 
@@ -115,12 +115,12 @@ Encoded column data  →  Snappy  →  Compressed block
 
 #### Why Columnar Compresses Better
 
-| Column Type | Compression Opportunity |
-|-------------|------------------------|
+| Column Type    | Compression Opportunity                      |
+| -------------- | -------------------------------------------- |
 | `department` | Few unique values → Dictionary + RLE (100x) |
-| `salary` | Similar numbers → Delta encoding (10x) |
-| `hire_date` | Sequential dates → Delta encoding (20x) |
-| `id` | Sequential integers → Delta encoding (50x) |
+| `salary`     | Similar numbers → Delta encoding (10x)      |
+| `hire_date`  | Sequential dates → Delta encoding (20x)     |
+| `id`         | Sequential integers → Delta encoding (50x)  |
 
 **Result**: 5-20x compression vs CSV, because same-type data clusters together.
 

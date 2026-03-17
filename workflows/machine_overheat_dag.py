@@ -50,6 +50,16 @@ SCRIPTS_DIR = Path(__file__).parent.parent / "scripts"
 # MLflow experiment name
 EXPERIMENT_NAME = "machine-overheat"
 
+# MLflow tracking URI (SageMaker MLflow App ARN)
+# Set via Airflow Variable 'MLFLOW_TRACKING_URI' or environment variable
+try:
+    MLFLOW_TRACKING_URI = Variable.get("MLFLOW_TRACKING_URI")
+except Exception:
+    MLFLOW_TRACKING_URI = os.environ.get(
+        "MLFLOW_TRACKING_URI",
+        "arn:aws:sagemaker:eu-west-1:658203403846:mlflow-app/app-IN74ELWDTMBI",
+    )
+
 
 # =============================================================================
 # DAG Default Arguments
@@ -134,6 +144,8 @@ def task_train_model() -> None:
             MODEL_PATH,
             "--experiment-name",
             EXPERIMENT_NAME,
+            "--tracking-uri",
+            MLFLOW_TRACKING_URI,
         ],
     )
 

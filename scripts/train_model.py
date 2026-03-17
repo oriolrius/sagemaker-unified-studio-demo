@@ -5,13 +5,14 @@ Train machine overheat prediction model with MLflow tracking.
 Loads feature dataset, trains a LogisticRegression model, logs experiment
 metrics to MLflow, and saves the model artifact.
 
-In SageMaker Unified Studio, MLFLOW_TRACKING_URI is automatically injected.
-Do NOT hardcode tracking URI - it is auto-configured at runtime.
+In SageMaker Studio AI, pass the MLflow App ARN as --tracking-uri.
+If MLFLOW_TRACKING_URI env var is set (e.g. in Unified Studio), it is used automatically.
 
 Usage:
     python train_model.py --input-path s3://bucket/data/features/features.parquet \
                           --model-output s3://bucket/models/model.joblib \
-                          --experiment-name machine-overheat
+                          --experiment-name machine-overheat \
+                          --tracking-uri arn:aws:sagemaker:REGION:ACCOUNT:mlflow-app/APP_ID
 """
 
 import argparse
@@ -51,8 +52,9 @@ Examples:
     python train_model.py --experiment-name my-experiment
 
 Note:
-    In SageMaker Unified Studio, MLFLOW_TRACKING_URI is automatically set.
-    Experiments will appear in Build > MLflow in the Studio UI.
+    In SageMaker Studio AI, pass the MLflow App ARN as --tracking-uri.
+    If MLFLOW_TRACKING_URI is already set in the environment, it is used automatically.
+    Experiments will appear in the MLflow section of SageMaker Studio.
         """,
     )
     parser.add_argument(
@@ -64,6 +66,12 @@ Note:
         "--model-output",
         type=str,
         help="S3 URI for output model file (default: s3://{BUCKET_NAME}/models/model.joblib)",
+    )
+    parser.add_argument(
+        "--tracking-uri",
+        type=str,
+        default=None,
+        help="MLflow tracking URI or SageMaker MLflow App ARN (default: MLFLOW_TRACKING_URI env var)",
     )
     parser.add_argument(
         "--experiment-name",
@@ -118,8 +126,9 @@ def main() -> int:
             experiment_name=args.experiment_name,
         )
 
-        # Set MLflow experiment
-        # NOTE: Do NOT call mlflow.set_tracking_uri() - it's auto-injected in Unified Studio
+        # Set MLflow tracking URI if provided (ARN or URL)
+        if args.tracking_uri:
+            mlflow.set_tracking_uri(args.tracking_uri)
         mlflow.set_experiment(args.experiment_name)
 
         log_json(
