@@ -112,7 +112,7 @@ Go to **Workflows** in the left sidebar, click **Create workflow**, and define t
 
 The visual editor shows the DAG with each task as a `SageMakerNotebookOperator` node:
 
-![Workflow visual editor showing 3-task pipeline](assets/unified-studio-workflow-visual-editor.png)
+![Workflow visual editor showing 5-task pipeline](assets/unified-studio-workflow-visual-editor.png)
 
 Click the **code icon** (`<>`) in the toolbar (top-right, next to the settings gear) to switch to **Code view**. Replace the YAML content with the configuration below — update the `mlflow_tracking_uri` value with your own MLflow App ARN:
 
@@ -195,13 +195,13 @@ Click **Apply**, then **Save**.
 ### Step 5. Run and verify
 
 1. Click the green **"Run"** button (top-right of the visual editor, visible in the screenshot above).
-2. Click the **clock icon** in the toolbar (or navigate to the Runs panel) to monitor progress. The **Runs** tab shows all executions with status, duration, and timestamps (~12 min total for the full pipeline):
+2. Click the **clock icon** in the toolbar (or navigate to the Runs panel) to monitor progress. The **Runs** tab shows all executions with status, duration, and timestamps (~25 min total for the full 5-task pipeline):
 
 ![Workflow Runs tab showing execution history](assets/unified-studio-workflow-runs.png)
 
-3. Click on a successful **Run ID** to see per-task details. Each of the 3 tasks runs as a `SageMakerNotebookOperator` with ~3 min duration:
+3. Click on a successful **Run ID** to see per-task details. All 5 tasks run as `SageMakerNotebookOperator` nodes (~3 min each, except deploy_endpoint which takes ~9 min for endpoint provisioning):
 
-![Workflow run details showing 3 successful tasks](assets/unified-studio-workflow-run-details.png)
+![Workflow run details showing 5 successful tasks](assets/unified-studio-workflow-run-details.png)
 
 4. Go to **MLflow** in the left sidebar and click **"Open MLflow"** on the connected tracking server. The MLflow UI shows the `machine-overheat` experiment:
 
